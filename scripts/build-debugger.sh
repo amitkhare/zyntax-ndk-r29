@@ -15,7 +15,7 @@ BUILD_JOBS=${BUILD_JOBS:-2}
 [[ $TARGET_PREFIX == /* && $HOST_PYTHON == /* && -x $HOST_PYTHON ]]
 command -v bison >/dev/null
 pkg-config --exists libpcre2-8
-test -f "$BUILD_DIR/llvm-android/install_manifest.txt"
+test -f "$BUILD_DIR/llvm-android/install_manifest_clang.txt"
 test -f "$BUILD_DIR/llvm-host/CMakeCache.txt"
 test -f "$SWIG_SOURCE_DIR/CMakeLists.txt"
 grep -q '^#if !defined(_WIN32)$' "$SOURCE_DIR/lldb/include/lldb/Host/Editline.h"

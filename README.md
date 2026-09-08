@@ -47,6 +47,8 @@ manifest's order. Original source archives remain available for provenance.
 
 The first stage produces compiler/tools under `/work/install/linux-aarch64`
 inside the Docker volume, with logs at `/work/logs/compiler-build.log`.
+Only the tools declared in `build-tools.txt` and Clang resource headers are
+built and installed through LLVM's standard component targets.
 `scripts/assemble-build-tools.sh` assembles the native build components with
 the actual `linux-arm64` host tag and checks host ELF files and entrypoints.
 It does not copy desktop executables or produce debugger placeholders.

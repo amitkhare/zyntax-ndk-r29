@@ -84,5 +84,10 @@ cmake -S "$SOURCE_DIR/llvm" -B "$android_build" "${common[@]}" "${android[@]}" \
   -DLLVM_VERSION_SUFFIX= \
   '-DCLANG_VENDOR=Android (r563880c, Android AArch64 host)' \
   -DCLANG_REPOSITORY_STRING=https://android.googlesource.com/toolchain/llvm-project
-cmake --build "$android_build" --parallel "$BUILD_JOBS"
-cmake --install "$android_build" --strip
+install_targets=(install-clang-resource-headers-stripped)
+while IFS= read -r tool; do
+  # These driver aliases are installed by the clang and lld components.
+  case "$tool" in clang++|clang-21|ld.lld) continue ;; esac
+  install_targets+=("install-$tool-stripped")
+done < "$(dirname "${BASH_SOURCE[0]}")/../build-tools.txt"
+cmake --build "$android_build" --parallel "$BUILD_JOBS" --target "${install_targets[@]}"
