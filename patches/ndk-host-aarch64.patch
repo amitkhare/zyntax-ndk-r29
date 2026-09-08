@@ -1,0 +1,242 @@
+diff --git a/build/cmake/android.toolchain.cmake b/build/cmake/android.toolchain.cmake
+--- a/build/cmake/android.toolchain.cmake
++++ b/build/cmake/android.toolchain.cmake
+@@ -273,11 +273,5 @@
+ set(_ANDROID_EXPORT_COMPATIBILITY_VARIABLES TRUE)
+ 
+-if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
+-  set(ANDROID_HOST_TAG linux-x86_64)
+-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+-  set(ANDROID_HOST_TAG darwin-x86_64)
+-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+-  set(ANDROID_HOST_TAG windows-x86_64)
+-endif()
++include("${CMAKE_CURRENT_LIST_DIR}/android-host-tag.cmake")
+ 
+ # Toolchain.
+diff --git a/build/cmake/android-legacy.toolchain.cmake b/build/cmake/android-legacy.toolchain.cmake
+--- a/build/cmake/android-legacy.toolchain.cmake
++++ b/build/cmake/android-legacy.toolchain.cmake
+@@ -381,11 +381,5 @@
+ endif()
+ 
+-if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
+-  set(ANDROID_HOST_TAG linux-x86_64)
+-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
+-  set(ANDROID_HOST_TAG darwin-x86_64)
+-elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+-  set(ANDROID_HOST_TAG windows-x86_64)
+-endif()
++include("${CMAKE_CURRENT_LIST_DIR}/android-host-tag.cmake")
+ 
+ if(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
+diff --git a/build/cmake/android-host-tag.cmake b/build/cmake/android-host-tag.cmake
+new file mode 100644
+--- /dev/null
++++ b/build/cmake/android-host-tag.cmake
+@@ -0,0 +1,29 @@
++# Copyright (C) 2016 The Android Open Source Project
++#
++# Licensed under the Apache License, Version 2.0 (the "License");
++# you may not use this file except in compliance with the License.
++# You may obtain a copy of the License at
++#
++#      http://www.apache.org/licenses/LICENSE-2.0
++#
++# Unless required by applicable law or agreed to in writing, software
++# distributed under the License is distributed on an "AS IS" BASIS,
++# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++# See the License for the specific language governing permissions and
++# limitations under the License.
++
++if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux OR CMAKE_HOST_SYSTEM_NAME STREQUAL Android)
++  if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)$")
++    set(ANDROID_HOST_TAG linux-arm64)
++  elseif(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL x86_64)
++    set(ANDROID_HOST_TAG linux-x86_64)
++  else()
++    message(FATAL_ERROR "Unsupported NDK host processor: ${CMAKE_HOST_SYSTEM_PROCESSOR}")
++  endif()
++elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
++  set(ANDROID_HOST_TAG darwin-x86_64)
++elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Windows)
++  set(ANDROID_HOST_TAG windows-x86_64)
++else()
++  message(FATAL_ERROR "Unsupported NDK host system: ${CMAKE_HOST_SYSTEM_NAME}")
++endif()
+diff --git a/build/tools/ndk_bin_common.sh b/build/tools/ndk_bin_common.sh
+--- a/build/tools/ndk_bin_common.sh
++++ b/build/tools/ndk_bin_common.sh
+@@ -27,7 +27,7 @@
+ 
+ HOST_ARCH=$(uname -m)
+ case $HOST_ARCH in
+-  arm64) HOST_ARCH=arm64;;
++  aarch64|arm64) HOST_ARCH=arm64;;
+   i?86) HOST_ARCH=x86;;
+   x86_64|amd64) HOST_ARCH=x86_64;;
+   *) echo "ERROR: Unknown host CPU architecture: $HOST_ARCH"
+@@ -43,7 +43,7 @@
+ fi
+ 
+-if [ $HOST_OS = cygwin ]; then
+-  ANDROID_NDK_PYTHON=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/windows-x86_64/python3/python.exe
+-else
+-  ANDROID_NDK_PYTHON=$ANDROID_NDK_ROOT/toolchains/llvm/prebuilt/$HOST_TAG/python3/bin/python3
++if [[ "$NDK_HOST_PYTHON" != /* || ! -x "$NDK_HOST_PYTHON" ]]; then
++  echo "ERROR: NDK_HOST_PYTHON must point to an executable absolute path: $NDK_HOST_PYTHON" >&2
++  exit 1
+ fi
++ANDROID_NDK_PYTHON=$NDK_HOST_PYTHON
+diff --git a/build/core/init.mk b/build/core/init.mk
+--- a/build/core/init.mk
++++ b/build/core/init.mk
+@@ -230,6 +230,15 @@
+     endif
+     HOST_ARCH := x86
+     HOST_ARCH64 := x86_64
++    ifeq ($(HOST_OS_BASE),linux)
++        HOST_UNAME_M := $(shell uname -m)
++        ifneq (,$(filter aarch64 arm64,$(HOST_UNAME_M)))
++            HOST_ARCH := arm64
++            HOST_ARCH64 := arm64
++        else ifneq ($(HOST_UNAME_M),x86_64)
++            $(call __ndk_error,Unsupported Linux host architecture: $(HOST_UNAME_M))
++        endif
++    endif
+ else
+     $(call ndk_log,Host CPU from environment: $(HOST_ARCH))
+ endif
+@@ -276,42 +285,11 @@
+-# Check for NDK-specific versions of our host tools
+-HOST_TOOLS_ROOT := $(NDK_ROOT)/prebuilt/$(HOST_TAG64)
+-HOST_PREBUILT := $(strip $(wildcard $(HOST_TOOLS_ROOT)/bin))
+-HOST_MAKE := $(strip $(NDK_HOST_MAKE))
++# Python is supplied by the selected host package installation.
+ HOST_PYTHON := $(strip $(NDK_HOST_PYTHON))
+ TOOLCHAIN_ROOT := $(NDK_ROOT)/toolchains/llvm/prebuilt/$(HOST_TAG64)
+-ifdef HOST_PREBUILT
+-    $(call ndk_log,Host tools prebuilt directory: $(HOST_PREBUILT))
+-    # The windows prebuilt binaries are for ndk-build.cmd
+-    # On cygwin, we must use the Cygwin version of these tools instead.
+-    ifneq ($(HOST_OS),cygwin)
+-        ifndef HOST_MAKE
+-            HOST_MAKE := $(wildcard $(HOST_PREBUILT)/make$(HOST_EXEEXT))
+-        endif
+-       ifndef HOST_PYTHON
+-            ifeq ($(HOST_OS),windows)
+-                HOST_PYTHON := $(wildcard $(TOOLCHAIN_ROOT)/python3/python$(HOST_EXEEXT))
+-            else
+-                HOST_PYTHON := $(wildcard $(TOOLCHAIN_ROOT)/python3/bin/python3$(HOST_EXEEXT))
+-            endif
+-        endif
+-    endif
+-else
+-    $(call ndk_log,Host tools prebuilt directory not found, using system tools)
+-endif
+-ifndef HOST_PYTHON
+-    HOST_PYTHON := python
++ifeq ($(filter /%,$(HOST_PYTHON)),)
++    $(call __ndk_error,NDK_HOST_PYTHON must point to an absolute Python package executable)
+ endif
+ 
+ HOST_ECHO := $(strip $(NDK_HOST_ECHO))
+-ifdef HOST_PREBUILT
+-    ifndef HOST_ECHO
+-        # Special case, on Cygwin, always use the host echo, not our prebuilt one
+-        # which adds \r\n at the end of lines.
+-        ifneq ($(HOST_OS),cygwin)
+-            HOST_ECHO := $(strip $(wildcard $(HOST_PREBUILT)/echo$(HOST_EXEEXT)))
+-        endif
+-    endif
+-endif
+ ifndef HOST_ECHO
+     HOST_ECHO := echo
+ endif
+@@ -329,10 +307,5 @@
+ 
+ HOST_CMP := $(strip $(NDK_HOST_CMP))
+-ifdef HOST_PREBUILT
+-    ifndef HOST_CMP
+-        HOST_CMP := $(strip $(wildcard $(HOST_PREBUILT)/cmp$(HOST_EXEEXT)))
+-    endif
+-endif
+ ifndef HOST_CMP
+     HOST_CMP := cmp
+ endif
+diff --git a/build/core/default-build-commands.mk b/build/core/default-build-commands.mk
+--- a/build/core/default-build-commands.mk
++++ b/build/core/default-build-commands.mk
+@@ -139,7 +139,7 @@
+ TARGET_CONLYFLAGS =
+ TARGET_CXXFLAGS = $(TARGET_CFLAGS)
+ 
+-TARGET_ASM      = $(TOOLCHAIN_ROOT)/bin/yasm
++TARGET_ASM      = $(if $(filter /%,$(NDK_HOST_YASM)),$(NDK_HOST_YASM),$(error NDK_HOST_YASM must point to an absolute Yasm package executable))
+ TARGET_ASMFLAGS =
+ 
+ TARGET_LD       = $(TOOLCHAIN_ROOT)/bin/ld
+diff --git a/build/ndk-build b/build/ndk-build
+--- a/build/ndk-build
++++ b/build/ndk-build
+@@ -117,30 +117,10 @@
+ log "HOST_TAG=$HOST_TAG"
+ 
+-# If GNUMAKE is defined, check that it points to a valid file
+-if [ -n "$GNUMAKE" ] ; then
+-    if ! ABS_GNUMAKE=$(which "$GNUMAKE" 2> /dev/null); then
+-        echo "ERROR: Your GNUMAKE variable is defined to an invalid name: $GNUMAKE"
+-        echo "Please fix it to point to a valid make executable (e.g. /usr/bin/make)"
+-        exit 1
+-    fi
+-    GNUMAKE="$ABS_GNUMAKE"
+-    log "GNUMAKE=$GNUMAKE (from environment variable)"
+-else
+-    # Otherwise use the prebuilt version for our host tag, if it exists
+-    # Note: we intentionally do not provide prebuilt make binaries for Cygwin
+-    # or MSys.
+-    GNUMAKE=$ANDROID_NDK_ROOT/prebuilt/$HOST_TAG/bin/make
+-    if [ ! -f "$GNUMAKE" ]; then
+-        # Otherwise, use 'make' and check that it is available
+-        if ! GNUMAKE=$(which make 2> /dev/null); then
+-            echo "ERROR: Cannot find 'make' program. Please install Cygwin make package"
+-            echo "or define the GNUMAKE variable to point to it."
+-            exit 1
+-        fi
+-        log "GNUMAKE=$GNUMAKE (system path)"
+-    else
+-        log "GNUMAKE=$GNUMAKE (NDK prebuilt)"
+-    fi
+-fi
++# GNU Make must be an explicitly selected package executable.
++if [[ "$GNUMAKE" != /* || ! -x "$GNUMAKE" ]]; then
++    echo "ERROR: GNUMAKE must point to an executable absolute path: $GNUMAKE" >&2
++    exit 1
++fi
++log "GNUMAKE=$GNUMAKE"
+ 
+ # On Windows, when running under cygwin, check that we are
+@@ -179,3 +159,3 @@
+ fi
+ 
+-"$GNUMAKE" -O -f "$PROGDIR/core/build-local.mk" $NDK_ANALYZER_FLAGS "$@"
++exec "$GNUMAKE" -O -f "$PROGDIR/core/build-local.mk" $NDK_ANALYZER_FLAGS "$@" "SHELL=$BASH"
+diff --git a/ndk-build b/ndk-build
+--- a/ndk-build
++++ b/ndk-build
+@@ -1,3 +1,3 @@
+-#!/bin/sh
+-DIR=$(cd "$(dirname "$0")" && pwd)
+-"$DIR/build/ndk-build" "$@"
++#!/usr/bin/env bash
++DIR=$(cd "$(dirname "$0")" && pwd)
++exec "$DIR/build/ndk-build" "$@"
+diff --git a/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
+--- a/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
++++ b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
+@@ -1,3 +1,4 @@
+-#!/bin/bash -e
++#!/usr/bin/env bash
++set -e
+ 
+ # Copyright 2022 Google Inc. All rights reserved.

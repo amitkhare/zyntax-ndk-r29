@@ -46,9 +46,15 @@ NDK's own `clang_source_info.md`, applying exactly those changes in the source
 manifest's order. Original source archives remain available for provenance.
 
 The first stage produces compiler/tools under `/work/install/linux-aarch64`
-inside the Docker volume, with logs at `/work/logs/compiler-build.log`. This is
-not yet an installable NDK: host-script porting, distribution assembly, notices,
-debugger dependencies and device verification remain separate roadmap items.
+inside the Docker volume, with logs at `/work/logs/compiler-build.log`.
+`scripts/assemble-build-tools.sh` assembles the native build components with
+the actual `linux-arm64` host tag and checks host ELF files and entrypoints.
+It does not copy desktop executables or produce debugger placeholders.
+See [distribution scope and dependencies](docs/build-distribution.md).
+Device verification is still required before packaging or publication.
+
+LLDB is a separate optional source-build stage. Profiling and shader tools
+from the desktop bundle are outside the initial native-build package.
 
 ## Roadmap
 
@@ -56,7 +62,7 @@ debugger dependencies and device verification remain separate roadmap items.
 - [x] Verify publishing authentication and the connected USB device.
 - [x] Pin official r29 source inputs and preserve source/license provenance.
 - [ ] Build dynamic Android-ARM64 Clang, LLD and LLVM binary utilities.
-- [ ] Port NDK host discovery and Bash entrypoints without architecture aliases.
+- [x] Port NDK host discovery and Bash entrypoints without architecture aliases.
 - [ ] Audit and complete the remaining host tools and distribution notices.
 - [ ] Address AGP's desktop-only NDK host lookup through proper tooling source
       changes, not app code, binary modification or a disguised host directory.
@@ -70,6 +76,11 @@ debugger dependencies and device verification remain separate roadmap items.
 Earlier sample APK/AAB signing checks succeeded without an NDK. Their device
 copies required compile SDK 37 for their declared AndroidX dependencies; those
 results are not evidence of native compilation or unchanged-project support.
+
+`tests/check-native.bash` is the focused device check: it builds one small C++
+shared library with CMake and `ndk-build`, then checks linking, loading and C++
+exceptions. It requires explicit tool paths and a new private output directory;
+it does not install packages, navigate the UI or touch signing keys.
 
 ## License
 
