@@ -68,8 +68,10 @@ bash ./gradlew --init-script /path/to/agp/select-fork.init.gradle \
   -PzyntaxAgpRepository=/path/to/maven-repository :app:assembleDebug
 ```
 
-The script uses Gradle's public `beforeSettings`, `pluginManagement` and
-`useModule` APIs. It logs each requested AGP version, selected fork coordinate
+The script uses Gradle's public `beforeSettings`, `pluginManagement`,
+`useVersion` and `useModule` APIs. It selects the fork version before its module
+so repeated root/subproject requests agree with the plugin already loaded.
+It logs each requested AGP version, selected fork coordinate
 and repository. Exact versions and public plugin IDs come from `releases.json`,
 checked against the source plugin descriptors. Unknown versions and plugins
 removed from a selected release fail; unrelated plugin IDs are untouched.
@@ -81,8 +83,10 @@ and versions declared through `pluginManagement`. It does not substitute
 Do not install the script globally or disable dependency verification. Without
 the explicit argument, the project continues to use its normal plugin selection.
 This is opt-in fork verification, not a claim that stock AGP supports Android hosts.
-Host-only configuration checks loaded both exact fork artifacts and verified
-rejection of an unsupported version; they did not run Android or native builds.
+Host-only configuration checks loaded both exact fork artifacts, including a
+root version-catalog alias with `apply false` repeated by an application module,
+and verified rejection of an unsupported version. They did not compile an
+Android project or run native tools.
 
 ## License and source
 

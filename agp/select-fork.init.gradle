@@ -28,6 +28,8 @@ beforeSettings { settings ->
                 throw new GradleException("No exact Zyntax AGP fork for ${id}:${version}; declare a supported plugin version.")
             }
             def coordinate = "app.zyntax.tools.build:gradle:${release.forkVersion}"
+            // Set the version first so repeated project requests match the loaded fork.
+            details.useVersion(release.forkVersion)
             details.useModule(coordinate)
             logger.lifecycle("Zyntax AGP: ${id}:${version} -> ${coordinate} (${repositoryUri})")
         }
