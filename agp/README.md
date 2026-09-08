@@ -3,8 +3,8 @@
 Whole-module source builds of **AGP 8.12.3 and 9.2.1**, packaged under distinct
 coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.1`.
 
-**Status: source build and local Maven packaging verified; not externally
-published or device-verified.**
+**Status: both source builds and focused USB native builds passed. Public
+package delivery is in progress.** See [verification](../docs/verification.md).
 
 The Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
 top-level class names as their exact Google releases: 2,377 for 8.12.3 and 2,413
@@ -12,7 +12,7 @@ for 9.2.1, with no missing, extra or duplicate paths. The corresponding source
 archives contain 1,827 and 1,826 unique Java/Kotlin files, without binary classes
 or duplicate paths. Notices, fork metadata and compiled `linux-arm64` host lookup
 are present. This verifies source builds and packaging, not native Android
-project builds on a device.
+project builds on a device; the separate USB results are recorded below.
 
 The recipe compiles every unique Java/Kotlin source in Google's checksum-pinned
 sources JAR, including its bundled module sources and generated protobuf Java.
@@ -96,6 +96,11 @@ root version-catalog alias with `apply false` repeated by an application module,
 an unversioned child inheriting that plugin, and a root buildscript classpath
 applied by a child application. Unsupported versions are rejected. These checks
 did not compile an Android project or run native tools.
+
+On USB, AGP 9.2.1 subsequently built native debug/release APKs and release AABs
+for both Groovy and Kotlin DSL sample projects. AGP 8.12.3 compiled the unchanged
+Zyntax JNI component in a private minimal library project using buildscript
+classpath selection. The latter is not a full Zyntax app build.
 
 ### Explicit NDK directory
 

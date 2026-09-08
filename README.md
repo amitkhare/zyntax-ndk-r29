@@ -3,8 +3,8 @@
 An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: compiler build and host-binary audit passed. USB validation is in
-progress; no verified release is available yet.**
+**Status: compiler audit, USB native builds and sample APK/AAB signing passed.
+Final package publication is in progress.** See [verification](docs/verification.md).
 
 ## Design
 
@@ -54,7 +54,7 @@ built and installed through LLVM's standard component targets.
 the actual `linux-arm64` host tag and checks host ELF files and entrypoints.
 It does not copy desktop executables or produce debugger placeholders.
 See [distribution scope and dependencies](docs/build-distribution.md).
-Device verification is still required before packaging or publication.
+The focused USB checks are recorded separately from packaging checks.
 
 LLDB is a separate [optional source-build stage](docs/debugger-build.md), with
 checksum-pinned shared package dependencies; it is not compiled or verified yet.
@@ -63,7 +63,8 @@ from the desktop bundle are outside the initial native-build package.
 
 The [AGP source build](agp/README.md) compiles versions 8.12.3 and 9.2.1 under
 distinct Maven coordinates. Both source builds, local packaging and explicit
-Gradle selection passed host checks; device builds remain separate work.
+Gradle selection passed host checks. AGP 9.2.1 built both native sample projects
+on Android; AGP 8.12.3 built the unchanged Zyntax JNI component separately.
 
 ## Roadmap
 
@@ -75,16 +76,19 @@ Gradle selection passed host checks; device builds remain separate work.
 - [x] Audit the native-build tools and preserve distribution notices.
 - [x] Address AGP's desktop-only NDK host lookup through proper tooling source
       changes, not app code, binary modification or a disguised host directory.
-- [ ] Package the exact NDK revision as a coinstallable `.deb`.
-- [ ] Verify CMake and `ndk-build` on USB, without UI navigation.
-- [ ] Verify native sample APK/AAB builds and signatures; keys stay outside
+- [x] Package the exact NDK revision as a coinstallable `.deb`.
+- [x] Verify CMake and `ndk-build` on USB, without UI navigation.
+- [x] Verify native sample APK/AAB builds and signatures; keys stay outside
       projects under the app's `~/.secrets`.
+- [x] Compile the unchanged Zyntax JNI component using packaged NDK r29 and
+      explicit AGP 8.12.3 selection, without publishing an app APK.
 - [ ] Verify Zyntax's Android project with its declared r29; do not publish APKs.
 - [ ] Publish the verified package and check signed repository installation.
 
-Earlier sample APK/AAB signing checks succeeded without an NDK. Their device
-copies required compile SDK 37 for their declared AndroidX dependencies; those
-results are not evidence of native compilation or unchanged-project support.
+Both sample projects now compile native libraries and produce verified signed
+release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
+required by their declared AndroidX dependencies, plus the requested native
+test module. This is not a claim that the original projects were unchanged.
 
 `tests/check-native.bash` is the focused device check: it builds one small C++
 shared library with CMake and `ndk-build`, then checks linking, loading and C++
