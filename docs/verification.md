@@ -38,6 +38,31 @@ AGP artifacts preserve upstream notices and include prepared source JARs.
 The review found no additional redistribution blocker for this scope; it is not
 a legal guarantee or a relicensing of upstream software.
 
-Final archive/package hashes and signed-repository installation results will
-be recorded after release packaging. LLDB and full-app builds remain separate
-roadmap items.
+## Release artifacts
+
+The native-only assembly excludes the debugger servers found in the unpublished
+first package candidate. This changes package contents, not compiler binaries.
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `ndk-r29-native.tar.xz` | 202273968 | `bb1087fd9dbba8c9100e1e6f090bc930cc6a322542ef91132fb38bdd6724ed05` |
+| `zyntax-ndk-29.0.14206865_29.0.14206865-2_aarch64.deb` | 171543804 | `00b247fd0960b12ac72cbc2689cc76f1aef8d9ae2e0bb01152175d5bc8820533` |
+| `zyntax-agp_1.0.0-1_all.deb` | 26542684 | `e2bb8718771f34951e640ff5f64582d5bd8b08100f354e172d14e9796624fb9a` |
+
+Assembly source: [84bcfff](https://github.com/amitkhare/zyntax-ndk-r29/commit/84bcfff).
+The `.deb` records the full commit and archive checksum in package provenance.
+Both final `.deb` files passed USB installation after refreshing signed package
+indexes. The installed AGP 8.12.3 rebuilt the actual JNI component; installed
+AGP 9.2.1 rebuilt all four sample native ABIs with the installed NDK directory.
+The installed NDK was checked for absence of debugger servers.
+
+Both packages are published at [pkg.zyntax.app](https://pkg.zyntax.app/dists/stable/main/binary-aarch64/Packages).
+Live `Release`/`InRelease` signatures, all three package-index hashes and all four
+package-object sizes passed verification. The USB device then refreshed signed
+indexes and downloaded/reinstalled both exact packages from that repository;
+installed versions and the compiler were verified. Existing Go and termux-exec
+package bytes were preserved. The superseded unpublished candidate was excluded.
+
+LLDB and full-app builds remain separate roadmap items. A full Zyntax Dev APK
+self-build also needs its exact SDK/build-tools inputs and explicit private
+signing configuration; the native component check does not cover those steps.

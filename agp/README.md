@@ -3,8 +3,9 @@
 Whole-module source builds of **AGP 8.12.3 and 9.2.1**, packaged under distinct
 coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.1`.
 
-**Status: both source builds and focused USB native builds passed. Public
-package delivery is in progress.** See [verification](../docs/verification.md).
+**Status: both source builds and focused USB native builds passed. Available in
+the optional `zyntax-agp` package at `pkg.zyntax.app`; signed installation verified.**
+See [verification](../docs/verification.md).
 
 The Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
 top-level class names as their exact Google releases: 2,377 for 8.12.3 and 2,413
@@ -58,6 +59,27 @@ upstream API/`Plugin-Version`; Maven coordinates, `Implementation-Version`
 and `META-INF/zyntax-agp.properties` identify the fork unambiguously.
 
 ## Explicit project selection
+
+The optional `zyntax-agp` APT package installs both exact fork versions and their
+source JARs under `$PREFIX/share/zyntax-agp/`. It contains one selector and release
+map, not a Gradle installation, JDK, global init script or dependency cache.
+After configuring the signed Zyntax package repository:
+
+```bash
+pkg update
+pkg install zyntax-agp zyntax-ndk-29.0.14206865
+bash ./gradlew --init-script "$PREFIX/share/zyntax-agp/select-fork.init.gradle" \
+  -PzyntaxAgpRepository="$PREFIX/share/zyntax-agp/repository" \
+  -PzyntaxNdkDirectory="$PREFIX/opt/android-sdk/ndk/29.0.14206865" \
+  :app:externalNativeBuildDebug
+```
+
+Use the project's matching JDK and installed Android SDK. For ndk-build, set
+`GNUMAKE` and `NDK_HOST_PYTHON` to the installed Make/Python executables. CMake
+projects select native CMake/Ninja with the standard `cmake.dir` local property.
+Complete APK/AAB builds additionally require compatible Android SDK tools; the
+sample checks explicitly selected native AAPT2 with `android.aapt2FromMavenOverride`.
+Installing this package does not download an SDK or configure projects.
 
 Invoke Gradle with [select-fork.init.gradle](select-fork.init.gradle) and an
 explicit Maven repository directory or HTTPS URI. Keep [releases.json](releases.json)

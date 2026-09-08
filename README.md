@@ -3,8 +3,9 @@
 An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: compiler audit, USB native builds and sample APK/AAB signing passed.
-Final package publication is in progress.** See [verification](docs/verification.md).
+**Status: native-build NDK r29 and both AGP forks are published as optional
+packages at `pkg.zyntax.app`. USB builds, signing and signed-repository installation
+passed.** See [verification](docs/verification.md) and [installation](agp/README.md#explicit-project-selection).
 
 ## Design
 
@@ -83,7 +84,7 @@ on Android; AGP 8.12.3 built the unchanged Zyntax JNI component separately.
 - [x] Compile the unchanged Zyntax JNI component using packaged NDK r29 and
       explicit AGP 8.12.3 selection, without publishing an app APK.
 - [ ] Verify Zyntax's Android project with its declared r29; do not publish APKs.
-- [ ] Publish the verified package and check signed repository installation.
+- [x] Publish the verified packages and check signed repository installation.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
