@@ -1,0 +1,19 @@
+diff --git a/com/android/build/gradle/internal/ndk/NdkR25Info.kt b/com/android/build/gradle/internal/ndk/NdkR25Info.kt
+--- a/com/android/build/gradle/internal/ndk/NdkR25Info.kt
++++ b/com/android/build/gradle/internal/ndk/NdkR25Info.kt
+@@ -92,7 +92,12 @@ class NdkR25Info(private val rootDirectory: File) : NdkInfo {
+     private val hostTag: String by lazy {
+-        when(currentPlatform()) {
++        when (currentPlatform()) {
+             PLATFORM_WINDOWS -> "windows-x86_64"
+-            PLATFORM_DARWIN-> "darwin-x86_64"
+-            else -> "linux-x86_64"
++            PLATFORM_DARWIN -> "darwin-x86_64"
++            PLATFORM_LINUX -> when (val architecture = System.getProperty("os.arch")) {
++                "aarch64", "arm64" -> "linux-arm64"
++                "amd64", "x86_64" -> "linux-x86_64"
++                else -> error("Unsupported NDK host architecture: $architecture")
++            }
++            else -> error("Unsupported NDK host operating system: ${System.getProperty("os.name")}")
+         }
+     }
