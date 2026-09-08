@@ -27,11 +27,34 @@ an external executable. It is not the source of release host binaries here.
 - `zyntax-packages-repo`: signed APT publication at `pkg.zyntax.app`.
 - App/SDK: unchanged. Studio UI is deferred until the toolchain works headlessly.
 
+## Build the compiler
+
+Requires Docker with Linux containers and Bash (Git Bash on Windows). The build
+uses two compilation jobs and one linker job by default; set `BUILD_JOBS` to
+change compilation concurrency. Allow substantial disk space for LLVM sources
+and intermediate files. Source builds are resumable in the Docker volume
+`zyntax-ndk-r29-work`; deleting that volume discards build progress.
+
+```bash
+bash scripts/build.sh
+```
+
+Downloads are checked against `sources.tsv` and cached in `.work/downloads`.
+The official NDK input's SHA-1 also matches Google's published r29 checksum;
+the build pins its SHA-256. LLVM's base and Android changes are taken from the
+NDK's own `clang_source_info.md`, applying exactly those changes in the source
+manifest's order. Original source archives remain available for provenance.
+
+The first stage produces compiler/tools under `/work/install/linux-aarch64`
+inside the Docker volume, with logs at `/work/logs/compiler-build.log`. This is
+not yet an installable NDK: host-script porting, distribution assembly, notices,
+debugger dependencies and device verification remain separate roadmap items.
+
 ## Roadmap
 
 - [x] Inspect the r29 candidate and reject static tools and fallback wrappers.
 - [x] Verify publishing authentication and the connected USB device.
-- [ ] Pin official r29 source inputs and preserve source/license provenance.
+- [x] Pin official r29 source inputs and preserve source/license provenance.
 - [ ] Build dynamic Android-ARM64 Clang, LLD and LLVM binary utilities.
 - [ ] Port NDK host discovery and Bash entrypoints without architecture aliases.
 - [ ] Audit and complete the remaining host tools and distribution notices.
