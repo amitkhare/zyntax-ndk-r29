@@ -13,7 +13,7 @@ plugins {
 group = 'app.zyntax.tools.build'
 def release = gradle.ext.agpRelease
 def upstreamVersion = release.version
-version = "${upstreamVersion}-zyntax.1"
+version = release.forkVersion
 layout.buildDirectory = file("../.work/agp/build-${upstreamVersion}")
 def inputsDirectory = file('../.work/agp/inputs')
 def sourceDirectory = file("../.work/agp/sources-${upstreamVersion}")

@@ -1,0 +1,35 @@
+import groovy.json.JsonSlurper
+
+// Explicit --init-script entry point; never install in Gradle's global init directories.
+def releases = new JsonSlurper().parse(new File(initscript.sourceFile.parentFile, 'releases.json'))
+def pluginIds = releases.values().collectMany { it.pluginIds }.toSet()
+
+beforeSettings { settings ->
+    def repository = settings.providers.gradleProperty('zyntaxAgpRepository').orNull
+    if (!repository) throw new GradleException('Set -PzyntaxAgpRepository to the fork Maven repository path or URI.')
+    def repositoryFile = new File(repository)
+    def repositoryUri = repositoryFile.absolute ? repositoryFile.toURI() : new URI(repository)
+    if (!(repositoryUri.scheme in ['file', 'https']) || repositoryUri.userInfo || repositoryUri.query || repositoryUri.fragment) {
+        throw new GradleException('The fork repository must be an absolute path or a file/HTTPS URI without credentials, query or fragment.')
+    }
+    settings.pluginManagement {
+        repositories {
+            exclusiveContent {
+                forRepository { maven { name = 'ZyntaxAgpFork'; url = repositoryUri } }
+                filter { includeModule('app.zyntax.tools.build', 'gradle') }
+            }
+        }
+        resolutionStrategy.eachPlugin { details ->
+            def id = details.requested.id.id
+            if (!pluginIds.contains(id)) return
+            def version = details.target.version
+            def release = releases[version]
+            if (release == null || !release.pluginIds.contains(id)) {
+                throw new GradleException("No exact Zyntax AGP fork for ${id}:${version}; declare a supported plugin version.")
+            }
+            def coordinate = "app.zyntax.tools.build:gradle:${release.forkVersion}"
+            details.useModule(coordinate)
+            logger.lifecycle("Zyntax AGP: ${id}:${version} -> ${coordinate} (${repositoryUri})")
+        }
+    }
+}

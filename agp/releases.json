@@ -1,5 +1,13 @@
 {
   "8.12.3": {
+    "forkVersion": "8.12.3-zyntax.1",
+    "pluginIds": [
+      "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
+      "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",
+      "com.android.fused-library", "com.android.kotlin.multiplatform.library",
+      "com.android.library", "com.android.lint", "com.android.privacy-sandbox-sdk",
+      "com.android.reporting", "com.android.test"
+    ],
     "gradle": "8.13",
     "gradleSha256": "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78",
     "kotlin": "2.1.20",
@@ -14,6 +22,13 @@
     "patch": "ndk-host.patch"
   },
   "9.2.1": {
+    "forkVersion": "9.2.1-zyntax.1",
+    "pluginIds": [
+      "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
+      "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",
+      "com.android.fused-library", "com.android.kotlin.multiplatform.library",
+      "com.android.library", "com.android.lint", "com.android.test"
+    ],
     "gradle": "9.4.1",
     "gradleSha256": "2ab2958f2a1e51120c326cad6f385153bb11ee93b3c216c5fccebfdfbb7ec6cb",
     "kotlin": "2.2.10",

@@ -52,10 +52,37 @@ Use `-Task publish` to write a **local** Maven repository under
 `.work/agp/build-<version>/repository/`; this does not upload anything.
 Unknown upstream versions fail; neither version substitutes for the other.
 
-This does **not** automatically replace stock AGP in existing projects. Explicit
-fork-selection policy remains separate work. Each artifact retains its exact
+This does **not** automatically replace stock AGP in existing projects.
+Each artifact retains its exact
 upstream API/`Plugin-Version`; Maven coordinates, `Implementation-Version`
 and `META-INF/zyntax-agp.properties` identify the fork unambiguously.
+
+## Explicit project selection
+
+Invoke Gradle with [select-fork.init.gradle](select-fork.init.gradle) and an
+explicit Maven repository directory or HTTPS URI. Keep [releases.json](releases.json)
+beside the script. For example, from the project root:
+
+```bash
+bash ./gradlew --init-script /path/to/agp/select-fork.init.gradle \
+  -PzyntaxAgpRepository=/path/to/maven-repository :app:assembleDebug
+```
+
+The script uses Gradle's public `beforeSettings`, `pluginManagement` and
+`useModule` APIs. It logs each requested AGP version, selected fork coordinate
+and repository. Exact versions and public plugin IDs come from `releases.json`,
+checked against the source plugin descriptors. Unknown versions and plugins
+removed from a selected release fail; unrelated plugin IDs are untouched.
+Only our module is resolved from the supplied repository.
+
+This supports versioned `plugins {}` requests, including version-catalog aliases
+and versions declared through `pluginManagement`. It does not substitute
+`buildscript` classpath dependencies or replace already-loaded plugin classes.
+Do not install the script globally or disable dependency verification. Without
+the explicit argument, the project continues to use its normal plugin selection.
+This is opt-in fork verification, not a claim that stock AGP supports Android hosts.
+Host-only configuration checks loaded both exact fork artifacts and verified
+rejection of an unsupported version; they did not run Android or native builds.
 
 ## License and source
 
