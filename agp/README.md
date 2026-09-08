@@ -69,24 +69,50 @@ bash ./gradlew --init-script /path/to/agp/select-fork.init.gradle \
 ```
 
 The script uses Gradle's public `beforeSettings`, `pluginManagement`,
-`useVersion` and `useModule` APIs. It selects the fork version before its module
-so repeated root/subproject requests agree with the plugin already loaded.
+`useVersion` and `useModule` APIs for `plugins {}` requests. It selects the fork
+version before its module so repeated root/subproject requests agree with the
+plugin already loaded.
 It logs each requested AGP version, selected fork coordinate
 and repository. Exact versions and public plugin IDs come from `releases.json`,
 checked against the source plugin descriptors. Unknown versions and plugins
 removed from a selected release fail; unrelated plugin IDs are untouched.
-Only our module is resolved from the supplied repository.
+Only our module is resolved from the supplied repository; it is excluded from
+other declared repositories. Ordinary content filters allow projects to retain
+their own `buildscript.repositories` declarations.
 
 This supports versioned `plugins {}` requests, including version-catalog aliases
-and versions declared through `pluginManagement`. It does not substitute
-`buildscript` classpath dependencies or replace already-loaded plugin classes.
+and versions declared through `pluginManagement`. For `buildscript` declarations,
+public `beforeProject` and classpath `resolutionStrategy.eachDependency` hooks
+select the exact fork with `useTarget`, using the same release mapping and logs.
+Only `com.android.tools.build:gradle` classpath dependencies are selected;
+unrelated dependencies and already-loaded plugin classes are not replaced.
+Unversioned child plugin requests retain Gradle's normal inherited-classpath
+resolution; the script does not select a new artifact for them.
 Do not install the script globally or disable dependency verification. Without
 the explicit argument, the project continues to use its normal plugin selection.
 This is opt-in fork verification, not a claim that stock AGP supports Android hosts.
 Host-only configuration checks loaded both exact fork artifacts, including a
 root version-catalog alias with `apply false` repeated by an application module,
-and verified rejection of an unsupported version. They did not compile an
-Android project or run native tools.
+an unversioned child inheriting that plugin, and a root buildscript classpath
+applied by a child application. Unsupported versions are rejected. These checks
+did not compile an Android project or run native tools.
+
+### Explicit NDK directory
+
+Optionally pass `-PzyntaxNdkDirectory=/absolute/path/to/ndk` to use a packaged NDK
+outside the selected SDK. For example, the `.deb` installs under
+`$PREFIX/opt/android-sdk/ndk/29.0.14206865`; `ANDROID_HOME` can remain
+`$HOME/android-sdk`.
+
+The script reads the directory's `source.properties` and uses the public
+`androidComponents.finalizeDsl`/`ndkPath` API for Android application, library,
+dynamic-feature and test modules with a declared `externalNativeBuild` CMake or
+ndk-build path. Their effective `ndkVersion` must match the selected revision;
+mismatches fail without changing that version. Non-native modules retain their
+NDK settings, including unused AGP defaults. Omitting the argument leaves NDK
+selection unchanged. No symlinks, `ndk.dir`, project-file edits or environment
+rewrites are used. Focused host configuration checks verified the selected
+directory, unchanged revision, and rejection of a mismatched revision.
 
 ## License and source
 
