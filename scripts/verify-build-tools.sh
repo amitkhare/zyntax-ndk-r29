@@ -10,6 +10,7 @@ grep -qx 'Pkg.Revision = 29.0.14206865' "$ndk/source.properties"
 test -d "$host/sysroot/usr/include"
 test -d "$host/lib/clang/21/lib/linux"
 test ! -e "$ndk/toolchains/llvm/prebuilt/linux-x86_64"
+test -z "$(find "$host" -name lldb-server -print -quit)"
 while IFS= read -r tool; do
     binary="$host/bin/$tool"
     test -x "$binary"

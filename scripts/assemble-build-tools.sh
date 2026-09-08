@@ -43,9 +43,9 @@ ln -s ld.lld "$host/bin/ld"
 # executables are not copied. Resource scripts for desktop profiling are omitted.
 cp -a "$NDK_DIR/$desktop_rel/sysroot" "$host/"
 mkdir -p "$host/lib/clang/21"
-cp -a "$NDK_DIR/$desktop_rel/lib/clang/21/include" \
-    "$NDK_DIR/$desktop_rel/lib/clang/21/lib" \
-    "$NDK_DIR/$desktop_rel/lib/clang/21/share" "$host/lib/clang/21/"
+# Target debugger servers are not compiler runtimes and are outside this package.
+tar -C "$NDK_DIR/$desktop_rel/lib/clang/21" --exclude='*/lldb-server' \
+    -cf - include lib share | tar -C "$host/lib/clang/21" -xf -
 cp -a "$NDK_DIR/$desktop_rel/NOTICE" "$NDK_DIR/$desktop_rel/AndroidVersion.txt" \
     "$NDK_DIR/$desktop_rel/clang_source_info.md" \
     "$NDK_DIR/$desktop_rel/manifest_13989888.xml" "$host/"
