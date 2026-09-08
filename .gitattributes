@@ -3,7 +3,7 @@
 *.bash text eol=lf
 *.mk text eol=lf
 *.cmake text eol=lf
-*.patch text eol=lf whitespace=-blank-at-eol
+*.patch text eol=lf whitespace=-blank-at-eol,-blank-at-eof
 *.tsv text eol=lf
 build-tools.txt text eol=lf
 Dockerfile text eol=lf

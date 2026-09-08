@@ -53,8 +53,14 @@ It does not copy desktop executables or produce debugger placeholders.
 See [distribution scope and dependencies](docs/build-distribution.md).
 Device verification is still required before packaging or publication.
 
-LLDB is a separate optional source-build stage. Profiling and shader tools
+LLDB is a separate [optional source-build stage](docs/debugger-build.md), with
+checksum-pinned shared package dependencies; it is not compiled or verified yet.
+Profiling and shader tools
 from the desktop bundle are outside the initial native-build package.
+
+The [AGP source build](agp/README.md) compiles versions 8.12.3 and 9.2.1 under
+distinct Maven coordinates. Both source builds and local packaging passed;
+explicit project selection and device builds remain separate work.
 
 ## Roadmap
 

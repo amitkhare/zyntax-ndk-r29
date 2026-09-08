@@ -6,15 +6,7 @@ work_dir=${WORK_DIR:-/work}
 downloads="$work_dir/downloads"
 mkdir -p "$downloads" "$work_dir/src" "$work_dir/ndk"
 
-while IFS=$'\t' read -r name checksum url; do
-    archive="$downloads/$name"
-    if [[ ! -f "$archive" ]]; then
-        curl --fail --location --retry 2 --output "$archive.part" "$url"
-        printf '%s  %s\n' "$checksum" "$archive.part" | sha256sum --check --status
-        mv "$archive.part" "$archive"
-    fi
-    printf '%s  %s\n' "$checksum" "$archive" | sha256sum --check
-done < "$repo_dir/sources.tsv"
+bash "$repo_dir/scripts/download-inputs.sh" "$repo_dir/sources.tsv" "$downloads"
 
 ndk="$work_dir/ndk/android-ndk-r29"
 if [[ ! -d "$ndk" ]]; then

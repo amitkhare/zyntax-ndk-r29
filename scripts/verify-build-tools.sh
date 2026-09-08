@@ -2,7 +2,7 @@
 set -euo pipefail
 
 repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-ndk=${1:?Pass the assembled NDK directory}
+ndk="$(cd "${1:?Pass the assembled NDK directory}" && pwd -P)"
 host="$ndk/toolchains/llvm/prebuilt/linux-arm64"
 readelf=${READELF:-/work/ndk/android-ndk-r29/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf}
 

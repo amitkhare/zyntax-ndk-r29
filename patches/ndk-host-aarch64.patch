@@ -1,7 +1,13 @@
 diff --git a/build/cmake/android.toolchain.cmake b/build/cmake/android.toolchain.cmake
 --- a/build/cmake/android.toolchain.cmake
 +++ b/build/cmake/android.toolchain.cmake
-@@ -273,11 +273,5 @@
+@@ -1,4 +1,5 @@
+ # Copyright (C) 2016 The Android Open Source Project
++# Modified by Zyntax for Android ARM64 host support.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+@@ -273,11 +274,5 @@
  set(_ANDROID_EXPORT_COMPATIBILITY_VARIABLES TRUE)
  
 -if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
@@ -17,7 +23,13 @@ diff --git a/build/cmake/android.toolchain.cmake b/build/cmake/android.toolchain
 diff --git a/build/cmake/android-legacy.toolchain.cmake b/build/cmake/android-legacy.toolchain.cmake
 --- a/build/cmake/android-legacy.toolchain.cmake
 +++ b/build/cmake/android-legacy.toolchain.cmake
-@@ -381,11 +381,5 @@
+@@ -1,4 +1,5 @@
+ # Copyright (C) 2016 The Android Open Source Project
++# Modified by Zyntax for Android ARM64 host support.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+@@ -381,11 +382,5 @@
  endif()
  
 -if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
@@ -34,8 +46,9 @@ diff --git a/build/cmake/android-host-tag.cmake b/build/cmake/android-host-tag.c
 new file mode 100644
 --- /dev/null
 +++ b/build/cmake/android-host-tag.cmake
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,30 @@
 +# Copyright (C) 2016 The Android Open Source Project
++# Modified by Zyntax for Android ARM64 host support.
 +#
 +# Licensed under the Apache License, Version 2.0 (the "License");
 +# you may not use this file except in compliance with the License.
@@ -67,7 +80,13 @@ new file mode 100644
 diff --git a/build/tools/ndk_bin_common.sh b/build/tools/ndk_bin_common.sh
 --- a/build/tools/ndk_bin_common.sh
 +++ b/build/tools/ndk_bin_common.sh
-@@ -27,7 +27,7 @@
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env bash
++# Modified by Zyntax for Android ARM64 host support.
+ #
+ # Copyright (C) 2022 The Android Open Source Project
+ #
+@@ -27,7 +28,7 @@
  
  HOST_ARCH=$(uname -m)
  case $HOST_ARCH in
@@ -76,7 +95,7 @@ diff --git a/build/tools/ndk_bin_common.sh b/build/tools/ndk_bin_common.sh
    i?86) HOST_ARCH=x86;;
    x86_64|amd64) HOST_ARCH=x86_64;;
    *) echo "ERROR: Unknown host CPU architecture: $HOST_ARCH"
-@@ -43,7 +43,7 @@
+@@ -43,7 +44,7 @@
  fi
  
 -if [ $HOST_OS = cygwin ]; then
@@ -91,7 +110,13 @@ diff --git a/build/tools/ndk_bin_common.sh b/build/tools/ndk_bin_common.sh
 diff --git a/build/core/init.mk b/build/core/init.mk
 --- a/build/core/init.mk
 +++ b/build/core/init.mk
-@@ -230,6 +230,15 @@
+@@ -1,4 +1,5 @@
+ # Copyright (C) 2009-2010 The Android Open Source Project
++# Modified by Zyntax for Android ARM64 host support.
+ #
+ # Licensed under the Apache License, Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+@@ -230,6 +231,15 @@
      endif
      HOST_ARCH := x86
      HOST_ARCH64 := x86_64
@@ -107,7 +132,7 @@ diff --git a/build/core/init.mk b/build/core/init.mk
  else
      $(call ndk_log,Host CPU from environment: $(HOST_ARCH))
  endif
-@@ -276,42 +285,11 @@
+@@ -276,42 +286,11 @@
 -# Check for NDK-specific versions of our host tools
 -HOST_TOOLS_ROOT := $(NDK_ROOT)/prebuilt/$(HOST_TAG64)
 -HOST_PREBUILT := $(strip $(wildcard $(HOST_TOOLS_ROOT)/bin))
@@ -153,7 +178,7 @@ diff --git a/build/core/init.mk b/build/core/init.mk
  ifndef HOST_ECHO
      HOST_ECHO := echo
  endif
-@@ -329,10 +307,5 @@
+@@ -329,10 +308,5 @@
  
  HOST_CMP := $(strip $(NDK_HOST_CMP))
 -ifdef HOST_PREBUILT
@@ -167,7 +192,12 @@ diff --git a/build/core/init.mk b/build/core/init.mk
 diff --git a/build/core/default-build-commands.mk b/build/core/default-build-commands.mk
 --- a/build/core/default-build-commands.mk
 +++ b/build/core/default-build-commands.mk
-@@ -139,7 +139,7 @@
+@@ -1,3 +1,4 @@
++# Modified by Zyntax for Android ARM64 host support.
+ # The following definitions are the defaults used by all toolchains.
+ # This is included in setup-toolchain.mk just before the inclusion
+ # of the toolchain's specific setup.mk file which can then override
+@@ -139,7 +140,7 @@
  TARGET_CONLYFLAGS =
  TARGET_CXXFLAGS = $(TARGET_CFLAGS)
  
@@ -179,7 +209,13 @@ diff --git a/build/core/default-build-commands.mk b/build/core/default-build-com
 diff --git a/build/ndk-build b/build/ndk-build
 --- a/build/ndk-build
 +++ b/build/ndk-build
-@@ -117,30 +117,10 @@
+@@ -1,4 +1,5 @@
+ #!/usr/bin/env bash
++# Modified by Zyntax for Android ARM64 host support.
+ #
+ # Copyright (C) 2010 The Android Open Source Project
+ #
+@@ -117,30 +118,10 @@
  log "HOST_TAG=$HOST_TAG"
  
 -# If GNUMAKE is defined, check that it points to a valid file
@@ -216,7 +252,7 @@ diff --git a/build/ndk-build b/build/ndk-build
 +log "GNUMAKE=$GNUMAKE"
  
  # On Windows, when running under cygwin, check that we are
-@@ -179,3 +159,3 @@
+@@ -179,3 +160,3 @@
  fi
  
 -"$GNUMAKE" -O -f "$PROGDIR/core/build-local.mk" $NDK_ANALYZER_FLAGS "$@"
@@ -224,19 +260,21 @@ diff --git a/build/ndk-build b/build/ndk-build
 diff --git a/ndk-build b/ndk-build
 --- a/ndk-build
 +++ b/ndk-build
-@@ -1,3 +1,3 @@
+@@ -1,3 +1,4 @@
 -#!/bin/sh
 -DIR=$(cd "$(dirname "$0")" && pwd)
 -"$DIR/build/ndk-build" "$@"
 +#!/usr/bin/env bash
++# Modified by Zyntax for Android ARM64 host support.
 +DIR=$(cd "$(dirname "$0")" && pwd)
 +exec "$DIR/build/ndk-build" "$@"
 diff --git a/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
 --- a/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
 +++ b/toolchains/llvm/prebuilt/linux-x86_64/bin/clang-tidy.sh
-@@ -1,3 +1,4 @@
+@@ -1,3 +1,5 @@
 -#!/bin/bash -e
 +#!/usr/bin/env bash
++# Modified by Zyntax for Android ARM64 host support.
 +set -e
  
  # Copyright 2022 Google Inc. All rights reserved.

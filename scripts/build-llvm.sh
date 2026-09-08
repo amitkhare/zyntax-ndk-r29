@@ -82,7 +82,7 @@ cmake -S "$SOURCE_DIR/llvm" -B "$android_build" "${common[@]}" "${android[@]}" \
   -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_LIBEDIT=OFF \
   -DLLVM_ENABLE_LIBXML2=OFF -DLLVM_ENABLE_CURL=OFF \
   -DLLVM_VERSION_SUFFIX= \
-  '-DCLANG_VENDOR=Android (r563880c; Android AArch64 host)' \
+  '-DCLANG_VENDOR=Android (r563880c, Android AArch64 host)' \
   -DCLANG_REPOSITORY_STRING=https://android.googlesource.com/toolchain/llvm-project
 cmake --build "$android_build" --parallel "$BUILD_JOBS"
 cmake --install "$android_build" --strip

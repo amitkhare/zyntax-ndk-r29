@@ -1,0 +1,18 @@
+diff --git a/lldb/include/lldb/Host/Editline.h b/lldb/include/lldb/Host/Editline.h
+--- a/lldb/include/lldb/Host/Editline.h
++++ b/lldb/include/lldb/Host/Editline.h
+@@ -1,4 +1,5 @@
+ //===-- Editline.h ----------------------------------------------*- C++ -*-===//
++// Modified by Zyntax for Android ARM64 host support.
+ //
+ // Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+ // See https://llvm.org/LICENSE.txt for license information.
+@@ -36,7 +37,7 @@
+ 
+ #include "lldb/lldb-private.h"
+ 
+-#if !defined(_WIN32) && !defined(__ANDROID__)
++#if !defined(_WIN32)
+ #include <histedit.h>
+ #endif
+ 

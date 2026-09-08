@@ -8,6 +8,7 @@ fixture="$(cd "$(dirname "${BASH_SOURCE[0]}")/native" && pwd)"
 : "${GNUMAKE:?Select the GNU Make package executable}"
 : "${NDK_HOST_PYTHON:?Select the Python package executable}"
 : "${CHECK_DIR:?Select a new app-private output directory}"
+[[ $CHECK_DIR == /* ]]
 for tool in "$CMAKE" "$NINJA" "$GNUMAKE" "$NDK_HOST_PYTHON"; do
     [[ $tool == /* && -x $tool ]]
 done
