@@ -5,21 +5,20 @@ import java.security.MessageDigest
 import java.util.zip.ZipFile
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '2.1.20'
+    id 'org.jetbrains.kotlin.jvm'
     id 'java-library'
     id 'maven-publish'
 }
 
 group = 'app.zyntax.tools.build'
-version = '8.12.3-zyntax.1'
-layout.buildDirectory = file('../.work/agp/build')
-
-def upstreamVersion = '8.12.3'
+def release = gradle.ext.agpRelease
+def upstreamVersion = release.version
+version = "${upstreamVersion}-zyntax.1"
+layout.buildDirectory = file("../.work/agp/build-${upstreamVersion}")
 def inputsDirectory = file('../.work/agp/inputs')
-def sourceDirectory = file('../.work/agp/sources')
+def sourceDirectory = file("../.work/agp/sources-${upstreamVersion}")
 def upstreamBase = "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/${upstreamVersion}/gradle-${upstreamVersion}"
-def sourceDigest = '794e59abd62d9474d17b55047a874cfe1f6bbc82245dd8b7a3ce8d8aae70d231'
-def pomDigest = '83a144a5214416ce3d88a89d290e48a5db7f25ab0957e41d6032ba652cf56801'
+def sourceDigest = release.sourceSha256
 def sha256 = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
 def verifiedInput = { String name, String url, String digest, boolean base64 = false ->
     def destination = new File(inputsDirectory, name)
@@ -37,7 +36,7 @@ def verifiedInput = { String name, String url, String digest, boolean base64 = f
 }
 
 // The exact upstream POM supplies peer dependencies, never the upstream implementation JAR.
-def upstreamPomFile = verifiedInput('gradle-8.12.3.pom', upstreamBase + '.pom', pomDigest)
+def upstreamPomFile = verifiedInput("gradle-${upstreamVersion}.pom", upstreamBase + '.pom', release.pomSha256)
 def upstreamPom = new XmlSlurper().parse(upstreamPomFile)
 def aaptVersion = upstreamPom.dependencies.dependency.find { it.artifactId.text() == 'aapt2-proto' }.version.text()
 if (!aaptVersion.startsWith(upstreamVersion + '-')) throw new GradleException('Unexpected AAPT2 metadata')
@@ -53,13 +52,13 @@ dependencies {
         add(scope, "${dependency.groupId.text()}:${dependency.artifactId.text()}:${dependency.version.text()}")
     }
     compileOnly gradleApi()
-    compileOnly 'com.android.tools:common:31.12.3'
-    compileOnly 'com.android.tools:annotations:31.12.3'
-    compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.20'
-    compileOnly 'org.jetbrains.kotlin:kotlin-gradle-plugin-idea:2.1.20'
-    compileOnly 'org.jacoco:org.jacoco.core:0.8.13'
-    compileOnly 'org.jacoco:org.jacoco.report:0.8.13'
-    compileOnly 'org.jetbrains.dokka:dokka-core:1.4.32'
+    compileOnly "com.android.tools:common:${release.tools}"
+    compileOnly "com.android.tools:annotations:${release.tools}"
+    compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin:${release.kotlin}"
+    compileOnly "org.jetbrains.kotlin:kotlin-gradle-plugin-idea:${release.kotlin}"
+    compileOnly "org.jacoco:org.jacoco.core:${release.jacoco}"
+    compileOnly "org.jacoco:org.jacoco.report:${release.jacoco}"
+    compileOnly "org.jetbrains.dokka:dokka-core:${release.dokka}"
 }
 
 configurations.compileClasspath.incoming.afterResolve {
@@ -70,25 +69,25 @@ configurations.compileClasspath.incoming.afterResolve {
 }
 
 // Exact proto resources omitted by Google's sources JAR. Each was compared byte-for-byte
-// with the 8.12.3 release resource; their immutable source commit is pinned independently.
-def protoCommit = '7dee427b8411d0356b29aad83651db2612f9340b'
+// with the corresponding release resource; their source commits are pinned independently.
 def protoDigests = [
     'app_bundle_dependencies_metadata.proto': 'f499cfed9932de17feec50b6e53a3cdd4c38898ec9761fe8b64215d7a266f675',
     'cxx_attribution.proto': 'b32e4ea8608a53a7b5840d3e25278e2aef8eee0ac91e83b065bcdf3207b73497',
     'cxx_caching.proto': '2f278457e1abde3401994b50cd22f6682cf719396f1c2df567804e9dc473c4e2',
-    'cxx_configure.proto': 'ab4a44be64dacbdbe5671f2b302f6b848d28ed21d22ab2aeaae7d894f5eae6d5',
+    'cxx_configure.proto': release.configureProtoSha256,
     'cxx_io.proto': '843a067fef95718cc6c75f76fd8bb06e4aa01d4d128b59ac677dab7a6cef07f6',
     'cxx_logging.proto': 'bd250849816752e979268b9dde0837a3629831ef7eea834a0b21eb4a85d693d7',
     'cxx_process.proto': '713310e2c88d0d1288d65f287ded2773b97765accca0dd8f2b47fa46a3ee85c5',
-    'version_control_metadata.proto': 'f8fe3d60bb0f4056754b4856245061d22e9dbf9a46ae1d20792f730d0240a211',
+    'version_control_metadata.proto': release.versionControlProtoSha256,
 ]
 
 def prepareSources = tasks.register('prepareSources') {
-    inputs.file('ndk-host.patch')
+    inputs.file(release.patch)
+    inputs.file('releases.json')
     inputs.file('build.gradle')
     outputs.dir(sourceDirectory)
     doLast {
-        def archive = verifiedInput('gradle-8.12.3-sources.jar', upstreamBase + '-sources.jar', sourceDigest)
+        def archive = verifiedInput("gradle-${upstreamVersion}-sources.jar", upstreamBase + '-sources.jar', sourceDigest)
         delete(sourceDirectory)
         sourceDirectory.mkdirs()
         new ZipFile(archive).withCloseable { zip ->
@@ -109,14 +108,14 @@ def prepareSources = tasks.register('prepareSources') {
             }
         }
         protoDigests.each { name, digest ->
-            def url = "https://android.googlesource.com/platform/tools/base/+/${protoCommit}/build-system/gradle-core/src/main/proto/${name}?format=TEXT"
-            def proto = verifiedInput(name, url, digest, true)
+            def url = "https://android.googlesource.com/platform/tools/base/+/${release.protoCommit}/build-system/gradle-core/src/main/proto/${name}?format=TEXT"
+            def proto = verifiedInput("${upstreamVersion}-${name}", url, digest, true)
             Files.copy(proto.toPath(), new File(sourceDirectory, name).toPath())
         }
-        exec {
+        providers.exec {
             workingDir projectDir.parentFile
-            commandLine 'git', 'apply', '--directory=.work/agp/sources', new File(projectDir, 'ndk-host.patch').absolutePath
-        }
+            commandLine 'git', 'apply', "--directory=.work/agp/sources-${upstreamVersion}", new File(projectDir, release.patch).absolutePath
+        }.result.get().assertNormalExitValue()
         def aaptProperties = new File(sourceDirectory, 'com/android/build/gradle/internal/res/aapt2_version.properties')
         aaptProperties.parentFile.mkdirs()
         aaptProperties.text = "aapt2Version=${aaptVersion.substring(upstreamVersion.length() + 1)}\n"
@@ -168,7 +167,7 @@ publishing {
             artifact sourcesJar
             pom {
                 name = 'Zyntax Android-host AGP'
-                description = 'Complete source rebuild of AGP 8.12.3 with native ARM64 host lookup.'
+                description = "Complete source rebuild of AGP ${upstreamVersion} with native ARM64 host lookup."
                 licenses { license { name = 'Apache License, Version 2.0'; url = 'https://www.apache.org/licenses/LICENSE-2.0' } }
             }
         }

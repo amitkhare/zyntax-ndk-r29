@@ -1,0 +1,30 @@
+{
+  "8.12.3": {
+    "gradle": "8.13",
+    "gradleSha256": "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78",
+    "kotlin": "2.1.20",
+    "tools": "31.12.3",
+    "jacoco": "0.8.13",
+    "dokka": "1.4.32",
+    "sourceSha256": "794e59abd62d9474d17b55047a874cfe1f6bbc82245dd8b7a3ce8d8aae70d231",
+    "pomSha256": "83a144a5214416ce3d88a89d290e48a5db7f25ab0957e41d6032ba652cf56801",
+    "protoCommit": "7dee427b8411d0356b29aad83651db2612f9340b",
+    "configureProtoSha256": "ab4a44be64dacbdbe5671f2b302f6b848d28ed21d22ab2aeaae7d894f5eae6d5",
+    "versionControlProtoSha256": "f8fe3d60bb0f4056754b4856245061d22e9dbf9a46ae1d20792f730d0240a211",
+    "patch": "ndk-host.patch"
+  },
+  "9.2.1": {
+    "gradle": "9.4.1",
+    "gradleSha256": "2ab2958f2a1e51120c326cad6f385153bb11ee93b3c216c5fccebfdfbb7ec6cb",
+    "kotlin": "2.2.10",
+    "tools": "32.2.1",
+    "jacoco": "0.8.14",
+    "dokka": "2.2.0",
+    "sourceSha256": "2b6fbf6fa80642759fa0ac32ccc6bfae2aa1d9ce27051162635dcae36eb5adcc",
+    "pomSha256": "9a353ced101656afaee9a6c4ff71d8486e824c95e11bb94320ed3cf8207c2fd6",
+    "protoCommit": "b8b45f4315821c8d41e0f7e10cd6059c836ba93b",
+    "configureProtoSha256": "fd280d809bf31ef22ded4c98312507755cc8a3f6e2fbbf82e01344f532584d16",
+    "versionControlProtoSha256": "7a8531d415d96ddc209bd1269681e69b904ff7c379fdfb68df61cb64eda418d8",
+    "patch": "ndk-host-9.2.1.patch"
+  }
+}

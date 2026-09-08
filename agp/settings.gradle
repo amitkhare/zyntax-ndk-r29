@@ -1,4 +1,10 @@
 pluginManagement {
+    def version = providers.gradleProperty('upstreamVersion').getOrElse('8.12.3')
+    def releases = new groovy.json.JsonSlurper().parse(file('releases.json'))
+    def release = releases[version]
+    if (release == null) throw new GradleException("Unsupported exact AGP version: ${version}")
+    gradle.ext.agpRelease = release + [version: version]
+    plugins { id 'org.jetbrains.kotlin.jvm' version release.kotlin }
     repositories {
         gradlePluginPortal()
         mavenCentral()

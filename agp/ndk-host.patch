@@ -1,7 +1,8 @@
 diff --git a/com/android/build/gradle/internal/ndk/NdkR25Info.kt b/com/android/build/gradle/internal/ndk/NdkR25Info.kt
 --- a/com/android/build/gradle/internal/ndk/NdkR25Info.kt
 +++ b/com/android/build/gradle/internal/ndk/NdkR25Info.kt
-@@ -92,7 +92,12 @@ class NdkR25Info(private val rootDirectory: File) : NdkInfo {
+@@ -92,7 +92,13 @@ class NdkR25Info(private val rootDirectory: File) : NdkInfo {
++    // Modified by Zyntax: select the native Linux toolchain for the JVM host architecture.
      private val hostTag: String by lazy {
 -        when(currentPlatform()) {
 +        when (currentPlatform()) {
