@@ -3,7 +3,8 @@
 An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: source port in progress. No verified release is available yet.**
+**Status: compiler build and host-binary audit passed. USB validation is in
+progress; no verified release is available yet.**
 
 ## Design
 
@@ -61,18 +62,18 @@ Profiling and shader tools
 from the desktop bundle are outside the initial native-build package.
 
 The [AGP source build](agp/README.md) compiles versions 8.12.3 and 9.2.1 under
-distinct Maven coordinates. Both source builds and local packaging passed;
-explicit project selection and device builds remain separate work.
+distinct Maven coordinates. Both source builds, local packaging and explicit
+Gradle selection passed host checks; device builds remain separate work.
 
 ## Roadmap
 
 - [x] Inspect the r29 candidate and reject static tools and fallback wrappers.
 - [x] Verify publishing authentication and the connected USB device.
 - [x] Pin official r29 source inputs and preserve source/license provenance.
-- [ ] Build dynamic Android-ARM64 Clang, LLD and LLVM binary utilities.
+- [x] Build dynamic Android-ARM64 Clang, LLD and LLVM binary utilities.
 - [x] Port NDK host discovery and Bash entrypoints without architecture aliases.
-- [ ] Audit and complete the remaining host tools and distribution notices.
-- [ ] Address AGP's desktop-only NDK host lookup through proper tooling source
+- [x] Audit the native-build tools and preserve distribution notices.
+- [x] Address AGP's desktop-only NDK host lookup through proper tooling source
       changes, not app code, binary modification or a disguised host directory.
 - [ ] Package the exact NDK revision as a coinstallable `.deb`.
 - [ ] Verify CMake and `ndk-build` on USB, without UI navigation.
