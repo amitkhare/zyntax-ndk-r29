@@ -75,8 +75,9 @@ artifacts remain private and uninstalled; this is not a release-runtime test.
 
 The [Android-qualified Gradle distribution](gradle/distribution/README.md) is
 source-built and passes two-build USB native/terminal/watcher integration checks.
-F2FS retention was tested with explicit watching; default F2FS support and
-distribution publication remain unfinished. No app or SDK code changed.
+Default F2FS watching now retains unchanged snapshots and detects edits across
+the real nested Android mount table, without an explicit watching flag.
+Distribution publication remains pending. No app or SDK code changed.
 
 ## Roadmap
 
@@ -100,7 +101,7 @@ distribution publication remain unfinished. No app or SDK code changed.
 - [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
 - [x] Verify source-built Android Gradle native-platform and file-events components.
 - [x] Verify native terminal components and source-built Android Gradle integration.
-- [ ] Enable and verify default F2FS watching in the Android distribution.
+- [x] Enable and verify default F2FS watching in the Android distribution.
 - [ ] Publish the verified Android Gradle distribution after release approval.
 
 Both sample projects now compile native libraries and produce verified signed
