@@ -14,6 +14,7 @@ existing app-private runtime; no UI navigation, app/SDK changes or app release.
 | Signing | Debug APK signatures verified; release APK alignment/signatures and strict AAB signatures verified |
 | AGP 8.12.3 fork / Gradle 8.13 | Unchanged Zyntax JNI source compiled with packaged NDK and explicit NDK directory |
 | AGP 8.12.3 and 8.13.0 forks / Gradle 8.14.3 | Complete unchanged Zyntax 0.9.4 DevDebug self-build, native compilation/stripping, signing and APK checks passed |
+| Same toolchain, DevRelease | R8, resource shrinking, test-signed APK/AAB, mapping and Bundletool validation passed |
 
 JDK 21.0.12 ran Gradle. Signing keys stayed outside projects under `~/.secrets`.
 No generated Zyntax APK was installed or published. The first JNI check used a
@@ -51,6 +52,37 @@ A separate 1.525s APK inspection found all 295 warned IDs among 1,487 resource
 definitions and resolved all 12 manifest resource references. The APK was not
 installed; this verifies the build and packaged resources, not UI behavior.
 DevDebug does not exercise R8 shrinking or obfuscation.
+
+## R8-enabled DevRelease self-build
+
+The same unchanged tracked source completed `:app:assembleDevRelease` and
+`:app:bundleDevRelease` with R8 and resource shrinking enabled. A separate
+test-only init script accepted only those two tasks and selected the existing
+debug/test keystore outside the project; no production signing key was used.
+The build completed 289 tasks in 10m 34s (USB check: 649.089s).
+
+| Output | Bytes | SHA-256 |
+| --- | ---: | --- |
+| DevRelease APK | 36468082 | `880da2f013c42374a7a70b29c9da4742ecdc82f2596a63ba92f1898a99252f20` |
+| DevRelease AAB | 37971318 | `70ddca871bc76e420e9674f3b1b81e5691bd62d0d40cf9870c716ecf6316eb9d` |
+| R8 mapping | 19610496 | `4a58a7d78d04751ea58e21afd611ddbd90e7863cea0ab5ba6218404831979d35` |
+
+DEX decreased from 16,155,288 debug bytes to 2,441,276 release bytes (84.9%).
+APK and AAB DEX contents matched; the AAB contained the exact R8 mapping.
+APK signature, non-debuggable Dev metadata, ARM64/native packaging, ZIP integrity
+and 16 KB ZIP alignment checks passed. Strict AAB signature verification passed.
+
+Jarsigner reported that the late ZIP manifest cannot be discovered by a streaming
+`JarInputStream`. The archive was not reordered or re-signed: the resolved AGP
+Bundletool 1.18.1 validator accepted it, and verifying `JarFile` reads confirmed
+all 476 payload entries had the expected single signing certificate. The AAB
+hash stayed unchanged. This follow-up passed in the same USB check as two
+successful nested project-model imports (205.204s total).
+
+No generated APK/AAB was installed or published, and no app/SDK source changed.
+These checks validate build/signature/package output, not optimized-app runtime
+behavior or Play acceptance. Source, signing inputs and generated app artifacts
+are not included in this public repository.
 
 ## Distribution audit
 

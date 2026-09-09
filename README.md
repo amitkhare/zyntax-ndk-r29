@@ -4,7 +4,7 @@ An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
 **Status: native-build NDK r29 and three exact AGP forks passed USB builds,
-including a full Zyntax DevDebug self-build. Optional toolchain packages are
+including full Zyntax DevDebug and R8-enabled DevRelease self-builds. Optional toolchain packages are
 published at `pkg.zyntax.app`; signed indexes and AGP package 1.0.0-2 downloads
 were verified on USB.** See [verification](docs/verification.md) and [installation](agp/README.md#explicit-project-selection).
 
@@ -69,6 +69,13 @@ passed host checks. AGP 9.2.1 built both native sample projects on Android.
 AGP 8.12.3 and 8.13.0 then built the complete unchanged Zyntax 0.9.4 DevDebug
 project with its declared NDK r29 and Gradle 8.14.3 wrapper. Native compilation,
 stripping, signing and APK checks passed; the APK was not installed or published.
+DevRelease APK/AAB builds also passed with test-only signing and Bundletool
+validation. R8 reduced DEX from 16,155,288 to 2,441,276 bytes. Generated app
+artifacts remain private and uninstalled; this is not a release-runtime test.
+
+The separate [Gradle native component port](gradle/README.md) passes Android
+JNI and filesystem-event checks. A complete Android Gradle distribution,
+including terminal services and explicit selection, is still in progress.
 
 ## Roadmap
 
@@ -89,6 +96,9 @@ stripping, signing and APK checks passed; the APK was not installed or published
 - [x] Verify Zyntax's complete Android project with its declared r29; do not
       install or publish the generated APK.
 - [x] Publish the verified packages and check signed repository installation.
+- [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
+- [x] Verify source-built Android Gradle native-platform and file-events components.
+- [ ] Complete native terminal services and Android Gradle distribution integration.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
