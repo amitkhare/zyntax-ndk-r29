@@ -21,6 +21,28 @@
     "versionControlProtoSha256": "f8fe3d60bb0f4056754b4856245061d22e9dbf9a46ae1d20792f730d0240a211",
     "patch": "ndk-host.patch"
   },
+  "8.13.0": {
+    "forkVersion": "8.13.0-zyntax.1",
+    "pluginIds": [
+      "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
+      "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",
+      "com.android.fused-library", "com.android.kotlin.multiplatform.library",
+      "com.android.library", "com.android.lint", "com.android.privacy-sandbox-sdk",
+      "com.android.reporting", "com.android.test"
+    ],
+    "gradle": "8.13",
+    "gradleSha256": "20f1b1176237254a6fc204d8434196fa11a4cfb387567519c61556e8710aed78",
+    "kotlin": "2.2.0",
+    "tools": "31.13.0",
+    "jacoco": "0.8.13",
+    "dokka": "1.4.32",
+    "sourceSha256": "00a377fac7809c94565cf9d8674e5768d15edb97d5870665e9d8d1f53e53eef4",
+    "pomSha256": "ee4182f4b5cb6544f36d23db5d159674ca9ea3db05a8e474295afcfc6cf510da",
+    "protoCommit": "7dee427b8411d0356b29aad83651db2612f9340b",
+    "configureProtoSha256": "ab4a44be64dacbdbe5671f2b302f6b848d28ed21d22ab2aeaae7d894f5eae6d5",
+    "versionControlProtoSha256": "f8fe3d60bb0f4056754b4856245061d22e9dbf9a46ae1d20792f730d0240a211",
+    "patch": "ndk-host.patch"
+  },
   "9.2.1": {
     "forkVersion": "9.2.1-zyntax.1",
     "pluginIds": [

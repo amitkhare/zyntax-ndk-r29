@@ -1,19 +1,27 @@
 # Android-host Android Gradle Plugin
 
-Whole-module source builds of **AGP 8.12.3 and 9.2.1**, packaged under distinct
+Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1**, packaged under distinct
 coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.1`.
 
-**Status: both source builds and focused USB native builds passed. Available in
-the optional `zyntax-agp` package at `pkg.zyntax.app`; signed installation verified.**
+**Status: all three source builds passed. AGP 8.12.3 and 9.2.1 also passed focused
+USB native builds and signed installation through the optional `zyntax-agp`
+package at `pkg.zyntax.app`. AGP 8.13.0 whole-app USB verification is pending.**
 See [verification](../docs/verification.md).
 
 The Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
-top-level class names as their exact Google releases: 2,377 for 8.12.3 and 2,413
-for 9.2.1, with no missing, extra or duplicate paths. The corresponding source
-archives contain 1,827 and 1,826 unique Java/Kotlin files, without binary classes
+top-level class names as their exact Google releases: 2,377 for 8.12.3, 2,388 for
+8.13.0 and 2,413 for 9.2.1, with no missing, extra or duplicate paths. Their source
+archives contain 1,827, 1,835 and 1,826 unique Java/Kotlin files, without binary classes
 or duplicate paths. Notices, fork metadata and compiled `linux-arm64` host lookup
 are present. This verifies source builds and packaging, not native Android
 project builds on a device; the separate USB results are recorded below.
+
+The 8.13.0 audit preserves all 54 exact POM dependencies and all 49 upstream
+noncompiled resources: 38 match byte-for-byte, while 11 properties files differ
+only in comments, preserving source notices and identical property values.
+The whole-module compilation regenerates Kotlin metadata as `gradle-core`;
+it does not copy the upstream bundled modules' compiled metadata or classes.
+The original and fork are compared for coverage, not byte-for-byte binaries.
 
 The recipe compiles every unique Java/Kotlin source in Google's checksum-pinned
 sources JAR, including its bundled module sources and generated protobuf Java.
@@ -38,20 +46,21 @@ no architecture aliases, runtime binary modification, app code or fallback.
 ## Build
 
 Requires PowerShell, Git and JDK 21. The shared recipe selects Gradle 8.13 for
-AGP 8.12.3 and Gradle 9.4.1 for AGP 9.2.1; each download is checked against its
+AGP 8.12.3 and 8.13.0, and Gradle 9.4.1 for AGP 9.2.1; each download is checked against its
 pinned SHA-256. Downloads, extracted sources, caches and output stay
 under the ignored repository `.work/agp/` directory. The build uses at most two
 workers and a 3 GiB Gradle heap.
 
 ```powershell
 ./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 8.12.3
+./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 8.13.0
 ./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 9.2.1
 ```
 
 Output: `.work/agp/build-<version>/libs/gradle-<version>-zyntax.1.jar`.
 Use `-Task publish` to write a **local** Maven repository under
 `.work/agp/build-<version>/repository/`; this does not upload anything.
-Unknown upstream versions fail; neither version substitutes for the other.
+Unknown upstream versions fail; no version substitutes for another.
 
 This does **not** automatically replace stock AGP in existing projects.
 Each artifact retains its exact
@@ -60,7 +69,7 @@ and `META-INF/zyntax-agp.properties` identify the fork unambiguously.
 
 ## Explicit project selection
 
-The optional `zyntax-agp` APT package installs both exact fork versions and their
+The optional `zyntax-agp` APT package installs exact fork versions and their
 source JARs under `$PREFIX/share/zyntax-agp/`. It contains one selector and release
 map, not a Gradle installation, JDK, global init script or dependency cache.
 After configuring the signed Zyntax package repository:
@@ -150,8 +159,16 @@ resources and source-provenance metadata. No app sources or private keys are use
 
 Primary inputs: [Google's 8.12.3 sources](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.12.3/gradle-8.12.3-sources.jar),
 [8.12.3 POM](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.12.3/gradle-8.12.3.pom),
+[8.13.0 sources](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.13.0/gradle-8.13.0-sources.jar),
+[8.13.0 POM](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.13.0/gradle-8.13.0.pom),
 [9.2.1 sources](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/9.2.1/gradle-9.2.1-sources.jar),
 [9.2.1 POM](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/9.2.1/gradle-9.2.1.pom).
 Source checksums, compiler/dependency versions and immutable proto commits are
 recorded in [releases.json](releases.json); shared resource checksums are in
 [build.gradle](build.gradle).
+
+AGP 8.13.0's [immutable upstream release metadata](https://android.googlesource.com/platform/tools/base/+/7dee427b8411d0356b29aad83651db2612f9340b/common/release_version.bzl)
+and [Maven catalog](https://android.googlesource.com/platform/tools/base/+/7dee427b8411d0356b29aad83651db2612f9340b/bazel/maven/artifacts.bzl)
+confirm Kotlin compiler/Gradle plugin 2.2.0, JaCoCo 0.8.13 and Dokka 1.4.32.
+Its NDK host-selection source is identical to 8.12.3, so both use the same
+`ndk-host.patch` without an additional version-specific source diff.
