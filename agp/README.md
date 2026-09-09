@@ -4,9 +4,9 @@ Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1** and their public
 `builder-model` modules, under distinct coordinates
 `app.zyntax.tools.build:<module>:<upstream-version>-zyntax.3`.
 
-**Candidate status: `-zyntax.3` exposes finalized CMake settings through AGP's
+**Published as APT package `1.0.0-3`: `-zyntax.3` exposes finalized CMake settings through AGP's
 existing public model. All three AGP/model source builds and the focused 8.12.3 USB
-model check passed. Artifacts are local only, not APT-packaged or published.**
+model check passed. Package contents, signed live indexes and downloaded bytes verified.**
 
 Historical `-zyntax.1` evidence: all three source builds passed. AGP 9.2.1 passed native sample builds;
 8.12.3 and 8.13.0 passed the complete unchanged Zyntax DevDebug self-build on USB.
@@ -108,6 +108,12 @@ implementation or model classes are used as compiler/packaging inputs.
 The new Windows/JDK 21 source builds executed 18 tasks each: 8.12.3 in 2m34s,
 8.13.0 in 2m20s and 9.2.1 in 3m8s. Native CMake selection, package resolution and
 complete automatic setup remain separate unfinished work.
+
+Package `1.0.0-3` contains the paired publications, source JARs and six original
+notices. All 24 artifacts and 96 checksum sidecars matched the pinned build inputs.
+After publication, signed indexes verified and the 30,243,960-byte package downloaded
+from `pkg.zyntax.app` matched SHA-256
+`507c3c8e14bf342e2308e1829ec153aff471c42e03caed4b096672286f26292b`.
 
 One corrected USB invocation passed both model operations in 242.804s. Four
 disabled-variant modules retained their later-finalized exact, `+`, omitted and

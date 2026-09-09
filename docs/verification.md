@@ -79,7 +79,8 @@ with the new revision. These new AGP artifacts are not published.
 The `-zyntax.3` AGP and public builder-model source builds passed for all three
 exact releases: 8.12.3 in 2m34s, 8.13.0 in 2m20s and 9.2.1 in 3m8s, with 18 tasks
 executed each. One shared build recipe prepares and publishes both source modules
-to a local Maven repository. These artifacts are not APT-packaged or published.
+to a local Maven repository. Their paired publications are now shipped in APT
+package `zyntax-agp` `1.0.0-3`.
 
 | Fork | AGP runtime SHA-256 | Model runtime SHA-256 |
 | --- | --- | --- |
@@ -93,6 +94,12 @@ comparisons retained all original model classes/methods; only `CmakeOptions` and
 `AndroidDsl.getCmake()` were added. POM/module metadata selects one exact owned
 model and excludes the original peer. The model's Kotlin bytecode is JVM11 like
 its Java classes; upstream already declared a JVM11 module minimum.
+
+The package archive check verified all 24 Maven artifacts, 96 checksum sidecars,
+six notices, prepared sources and provenance. Signed live indexes verified, and
+the 30,243,960-byte package downloaded from `pkg.zyntax.app` matched SHA-256
+`507c3c8e14bf342e2308e1829ec153aff471c42e03caed4b096672286f26292b`.
+This publication check does not add a device native-build result.
 
 The corrected USB invocation passed in **242.804s / OK (1 test)**. Its two
 scalar-only model actions used the exact 8.12.3 candidate, previously verified

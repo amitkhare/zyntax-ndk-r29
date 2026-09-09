@@ -28,6 +28,8 @@ an external executable. It is not the source of release host binaries here.
   build scripts, notices and verification evidence.
 - `zyntax-packages`: `.deb` recipes and package builds consuming verified output.
 - `zyntax-packages-repo`: signed APT publication at `pkg.zyntax.app`.
+- [`zyntax-gradle`](https://github.com/amitkhare/zyntax-gradle): separate Android
+  Gradle runtime sources, build recipes and distribution releases.
 - App/SDK: unchanged. Studio UI is deferred until the toolchain works headlessly.
 
 ## Build the compiler
@@ -73,18 +75,14 @@ DevRelease APK/AAB builds also passed with test-only signing and Bundletool
 validation. R8 reduced DEX from 16,155,288 to 2,441,276 bytes. Generated app
 artifacts remain private and uninstalled; this is not a release-runtime test.
 
-The unpublished AGP work adds typed missing-NDK diagnostics and finalized CMake
+AGP package `1.0.0-3` adds typed missing-NDK diagnostics and finalized CMake
 settings through existing AGP models. The `-zyntax.2` NDK diagnostic check and
 `-zyntax.3` CMake model check passed on USB; all three exact AGP/model source
 builds passed. A shared recipe builds one public model dependency, without duplicate
 API classes. App/SDK are unchanged. Native package resolution and complete automatic
 setup remain unfinished; model values alone do not establish tool availability.
-
-The [Android-qualified Gradle distribution](gradle/distribution/README.md) is
-source-built and passes two-build USB native/terminal/watcher integration checks.
-Default F2FS watching now retains unchanged snapshots and detects edits across
-the real nested Android mount table, without an explicit watching flag.
-Distribution publication remains pending. No app or SDK code changed.
+The signed live indexes and exact downloaded package bytes were verified after
+publication; this does not extend the scoped device-model results to native builds.
 
 ## Roadmap
 
@@ -106,12 +104,8 @@ Distribution publication remains pending. No app or SDK code changed.
       install or publish the generated APK.
 - [x] Publish the verified packages and check signed repository installation.
 - [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
-- [x] Verify source-built Android Gradle native-platform and file-events components.
-- [x] Verify native terminal components and source-built Android Gradle integration.
-- [x] Enable and verify default F2FS watching in the Android distribution.
 - [x] Expose and verify typed missing-NDK sync diagnostics without weakening build errors.
 - [x] Expose and verify finalized CMake settings through the existing AGP public model.
-- [ ] Publish the verified Android Gradle distribution after release approval.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
