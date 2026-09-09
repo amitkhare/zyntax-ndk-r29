@@ -29,8 +29,8 @@ source patch. The build-only distribution does not include GNU Make, Python,
 SWIG, LLDB, profiling or shader tools. Shared package dependencies retain their
 own licenses and are not relicensed or duplicated by this package.
 
-The separate AGP source build preserves its upstream notices and provides its
-prepared sources artifact. It does not contain Zyntax app code.
+The separate AGP and public builder-model source builds preserve their upstream
+notices and provide their prepared sources artifacts. Neither contains Zyntax app code.
 
 This public repository contains no Zyntax app implementation, signing keys or
 credentials. The NDK port is separate tooling, not app code. Publication is

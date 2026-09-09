@@ -6,6 +6,7 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 // Explicit --init-script entry point; never install in Gradle's global init directories.
 def releases = new JsonSlurper().parse(new File(initscript.sourceFile.parentFile, 'releases.json'))
 def pluginIds = releases.values().collectMany { it.pluginIds }.toSet()
+def forkModules = ['gradle', 'builder-model']
 def nativePluginIds = ['com.android.application', 'com.android.library', 'com.android.dynamic-feature', 'com.android.test']
 
 beforeSettings { settings ->
@@ -17,12 +18,12 @@ beforeSettings { settings ->
         throw new GradleException('The fork repository must be an absolute path or a file/HTTPS URI without credentials, query or fragment.')
     }
 
-    def selectFork = { requested, version, pluginId ->
+    def selectFork = { requested, version, pluginId, module ->
         def release = releases[version]
         if (release == null || (pluginId != null && !release.pluginIds.contains(pluginId))) {
             throw new GradleException("No exact Zyntax AGP fork for ${requested}:${version}; declare a supported version.")
         }
-        def coordinate = "app.zyntax.tools.build:gradle:${release.forkVersion}"
+        def coordinate = "app.zyntax.tools.build:${module}:${release.forkVersion}"
         logger.lifecycle("Zyntax AGP: ${requested}:${version} -> ${coordinate} (${repositoryUri})")
         [version: release.forkVersion, coordinate: coordinate]
     }
@@ -30,12 +31,12 @@ beforeSettings { settings ->
         def forkRepository = repositories.maven {
             name = 'ZyntaxAgpFork'
             url = repositoryUri
-            content { descriptor -> descriptor.includeModule('app.zyntax.tools.build', 'gradle') }
+            content { descriptor -> forkModules.each { descriptor.includeModule('app.zyntax.tools.build', it) } }
         }
         [MavenArtifactRepository, IvyArtifactRepository, FlatDirectoryArtifactRepository].each { type ->
             repositories.withType(type).all { repositoryEntry ->
                 if (repositoryEntry != forkRepository) {
-                    repositoryEntry.content { descriptor -> descriptor.excludeModule('app.zyntax.tools.build', 'gradle') }
+                    repositoryEntry.content { descriptor -> forkModules.each { descriptor.excludeModule('app.zyntax.tools.build', it) } }
                 }
             }
         }
@@ -45,7 +46,7 @@ beforeSettings { settings ->
         def id = details.requested.id.id
         if (!pluginIds.contains(id)) return
         if (details.target.version == null) return // Gradle owns unversioned inherited plugin requests.
-        def selected = selectFork(id, details.target.version, id)
+        def selected = selectFork(id, details.target.version, id, 'gradle')
         // Set the version first so repeated project requests match the loaded fork.
         details.useVersion(selected.version)
         details.useModule(selected.coordinate)
@@ -73,8 +74,8 @@ beforeSettings { settings ->
         project.buildscript.configurations.matching { it.name == 'classpath' }.configureEach { configuration ->
             configuration.resolutionStrategy.eachDependency { details ->
                 def requested = details.requested
-                if (requested.group != 'com.android.tools.build' || requested.name != 'gradle') return
-                def selected = selectFork("${requested.group}:${requested.name}", requested.version, null)
+                if (requested.group != 'com.android.tools.build' || !forkModules.contains(requested.name)) return
+                def selected = selectFork("${requested.group}:${requested.name}", requested.version, null, requested.name)
                 details.useTarget(selected.coordinate)
                 details.because('Explicit Zyntax Android-host AGP selection')
             }

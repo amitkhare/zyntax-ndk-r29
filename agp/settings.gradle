@@ -12,3 +12,4 @@ pluginManagement {
 }
 
 rootProject.name = 'gradle'
+include ':builder-model'

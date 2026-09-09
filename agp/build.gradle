@@ -1,8 +1,4 @@
-import groovy.xml.XmlSlurper
 import java.nio.file.Files
-import java.nio.file.StandardCopyOption
-import java.security.MessageDigest
-import java.util.zip.ZipFile
 
 plugins {
     id 'org.jetbrains.kotlin.jvm'
@@ -10,47 +6,30 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'app.zyntax.tools.build'
-def release = gradle.ext.agpRelease
-def upstreamVersion = release.version
-version = release.forkVersion
-layout.buildDirectory = file("../.work/agp/build-${version}")
-def inputsDirectory = file('../.work/agp/inputs')
-def sourceDirectory = file("../.work/agp/sources-${version}")
-def upstreamBase = "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/${upstreamVersion}/gradle-${upstreamVersion}"
-def sourceDigest = release.sourceSha256
-def sha256 = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
-def verifiedInput = { String name, String url, String digest, boolean base64 = false ->
-    def destination = new File(inputsDirectory, name)
-    if (!destination.exists()) {
-        inputsDirectory.mkdirs()
-        byte[] bytes = new URI(url).toURL().bytes
-        if (base64) bytes = Base64.decoder.decode(bytes)
-        if (sha256(bytes) != digest) throw new GradleException("Source checksum mismatch: ${name}")
-        def temporary = new File(inputsDirectory, name + '.part')
-        temporary.bytes = bytes
-        Files.move(temporary.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING)
+// Configure typed Kotlin options where the plugin supplies its script classpath.
+allprojects {
+    plugins.withId('org.jetbrains.kotlin.jvm') {
+        kotlin.compilerOptions {
+            moduleName = project == rootProject ? 'gradle-core' : project.name
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+            apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+            languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
+            freeCompilerArgs.add('-Xjvm-default=all-compatibility')
+        }
     }
-    if (sha256(destination.bytes) != digest) throw new GradleException("Cached source checksum mismatch: ${name}")
-    destination
 }
 
-// The exact upstream POM supplies peer dependencies, never the upstream implementation JAR.
-def upstreamPomFile = verifiedInput("gradle-${upstreamVersion}.pom", upstreamBase + '.pom', release.pomSha256)
-def upstreamPom = new XmlSlurper().parse(upstreamPomFile)
+def release = gradle.ext.agpRelease
+def upstreamVersion = release.version
+ext.moduleSourceSha256 = release.sourceSha256
+ext.modulePomSha256 = release.pomSha256
+ext.modulePatch = release.patch
+apply from: 'source-module.gradle'
+
 def aaptVersion = upstreamPom.dependencies.dependency.find { it.artifactId.text() == 'aapt2-proto' }.version.text()
 if (!aaptVersion.startsWith(upstreamVersion + '-')) throw new GradleException('Unexpected AAPT2 metadata')
 
-repositories {
-    google()
-    mavenCentral()
-}
-
 dependencies {
-    upstreamPom.dependencies.dependency.each { dependency ->
-        def scope = dependency.scope.text() == 'compile' ? 'api' : 'implementation'
-        add(scope, "${dependency.groupId.text()}:${dependency.artifactId.text()}:${dependency.version.text()}")
-    }
     compileOnly gradleApi()
     compileOnly "com.android.tools:common:${release.tools}"
     compileOnly "com.android.tools:annotations:${release.tools}"
@@ -61,15 +40,8 @@ dependencies {
     compileOnly "org.jetbrains.dokka:dokka-core:${release.dokka}"
 }
 
-configurations.compileClasspath.incoming.afterResolve {
-    def forbidden = configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.find {
-        it.moduleVersion.id.group == 'com.android.tools.build' && it.name == 'gradle'
-    }
-    if (forbidden != null) throw new GradleException('The upstream AGP implementation must not be a compiler input')
-}
-
-// Exact proto resources omitted by Google's sources JAR. Each was compared byte-for-byte
-// with the corresponding release resource; their source commits are pinned independently.
+// Exact proto resources omitted by Google's AGP sources JAR. Each was compared
+// byte-for-byte with its release resource and pinned to an immutable source commit.
 def protoDigests = [
     'app_bundle_dependencies_metadata.proto': 'f499cfed9932de17feec50b6e53a3cdd4c38898ec9761fe8b64215d7a266f675',
     'cxx_attribution.proto': 'b32e4ea8608a53a7b5840d3e25278e2aef8eee0ac91e83b065bcdf3207b73497',
@@ -81,96 +53,23 @@ def protoDigests = [
     'version_control_metadata.proto': release.versionControlProtoSha256,
 ]
 
-def prepareSources = tasks.register('prepareSources') {
-    inputs.file(release.patch)
-    inputs.file('releases.json')
-    inputs.file('build.gradle')
-    outputs.dir(sourceDirectory)
+tasks.named('prepareSources') {
     doLast {
-        def archive = verifiedInput("gradle-${upstreamVersion}-sources.jar", upstreamBase + '-sources.jar', sourceDigest)
-        delete(sourceDirectory)
-        sourceDirectory.mkdirs()
-        new ZipFile(archive).withCloseable { zip ->
-            zip.entries().each { entry ->
-                if (entry.directory || entry.name == 'META-INF/MANIFEST.MF') return
-                // Google's generated protobuf sources appear twice, under java/ and their
-                // package path. Normalize only identical copies; a conflict is an error.
-                def name = entry.name.startsWith('java/') ? entry.name.substring(5) : entry.name
-                def destination = sourceDirectory.toPath().resolve(name).normalize()
-                if (!destination.startsWith(sourceDirectory.toPath())) throw new GradleException('Invalid source archive path')
-                byte[] bytes = zip.getInputStream(entry).withCloseable { it.bytes }
-                if (Files.exists(destination)) {
-                    if (!Arrays.equals(Files.readAllBytes(destination), bytes)) throw new GradleException("Conflicting source: ${name}")
-                } else {
-                    Files.createDirectories(destination.parent)
-                    Files.write(destination, bytes)
-                }
-            }
-        }
         protoDigests.each { name, digest ->
             def url = "https://android.googlesource.com/platform/tools/base/+/${release.protoCommit}/build-system/gradle-core/src/main/proto/${name}?format=TEXT"
             def proto = verifiedInput("${upstreamVersion}-${name}", url, digest, true)
             Files.copy(proto.toPath(), new File(sourceDirectory, name).toPath())
         }
-        providers.exec {
-            workingDir projectDir.parentFile
-            commandLine 'git', 'apply', "--directory=.work/agp/sources-${version}", new File(projectDir, release.patch).absolutePath
-        }.result.get().assertNormalExitValue()
         def aaptProperties = new File(sourceDirectory, 'com/android/build/gradle/internal/res/aapt2_version.properties')
         aaptProperties.parentFile.mkdirs()
         aaptProperties.text = "aapt2Version=${aaptVersion.substring(upstreamVersion.length() + 1)}\n"
         new File(sourceDirectory, 'META-INF/gradle-plugins/com.android.ai-pack.properties').text =
             'implementation-class=com.android.build.gradle.AiPackPlugin\n'
-        new File(sourceDirectory, 'META-INF/zyntax-agp.properties').text =
-            "coordinate=${project.group}:${project.name}:${project.version}\nupstreamVersion=${upstreamVersion}\nsourceSha256=${sourceDigest}\n"
     }
 }
 
-sourceSets.main {
-    java.setSrcDirs([sourceDirectory])
-    resources.setSrcDirs([sourceDirectory])
-    resources.exclude('**/*.java', '**/*.kt')
-}
-kotlin.sourceSets.main.kotlin.setSrcDirs([sourceDirectory])
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
 kotlin.compilerOptions {
-    moduleName = 'gradle-core'
-    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
-    apiVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
-    languageVersion = org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_0
-    freeCompilerArgs.addAll('-Xjvm-default=all-compatibility', '-Xlambdas=class',
+    freeCompilerArgs.addAll('-Xlambdas=class',
         '-Xsam-conversions=class', '-Xjdk-release=11', '-XXLanguage:-TypeEnhancementImprovementsInStrictMode')
 }
-tasks.named('compileKotlin') { dependsOn prepareSources }
-tasks.named('compileJava') { dependsOn prepareSources; options.release = 11 }
-tasks.named('processResources') { dependsOn prepareSources }
-tasks.named('jar') {
-    manifest.attributes('Implementation-Title': 'Zyntax Android-host AGP',
-        'Implementation-Version': project.version, 'Plugin-Version': upstreamVersion)
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-}
-def sourcesJar = tasks.register('sourcesJar', Jar) {
-    dependsOn prepareSources
-    archiveClassifier = 'sources'
-    from(sourceDirectory)
-    preserveFileTimestamps = false
-    reproducibleFileOrder = true
-}
-publishing {
-    publications {
-        fork(MavenPublication) {
-            from components.java
-            artifact sourcesJar
-            pom {
-                name = 'Zyntax Android-host AGP'
-                description = "Complete source rebuild of AGP ${upstreamVersion} with native ARM64 host lookup."
-                licenses { license { name = 'Apache License, Version 2.0'; url = 'https://www.apache.org/licenses/LICENSE-2.0' } }
-            }
-        }
-    }
-    repositories { maven { url = layout.buildDirectory.dir('repository') } }
-}
+tasks.named('publish') { dependsOn ':builder-model:publish' }

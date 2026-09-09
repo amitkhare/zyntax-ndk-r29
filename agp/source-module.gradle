@@ -1,0 +1,132 @@
+import groovy.xml.XmlSlurper
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+import java.security.MessageDigest
+import java.util.zip.ZipFile
+
+// Shared whole-source recipe for AGP and its public model. Never overlay classes.
+group = 'app.zyntax.tools.build'
+def release = gradle.ext.agpRelease
+def upstreamVersion = release.version
+version = release.forkVersion
+def module = project.name
+def workDirectory = rootProject.file('../.work/agp')
+layout.buildDirectory = new File(workDirectory, "build-${version}" + (project == rootProject ? '' : "/${module}"))
+ext.sourceDirectory = new File(workDirectory, (project == rootProject ? 'sources' : "${module}-sources") + "-${version}")
+def inputsDirectory = new File(workDirectory, 'inputs')
+def upstreamBase = "https://dl.google.com/dl/android/maven2/com/android/tools/build/${module}/${upstreamVersion}/${module}-${upstreamVersion}"
+def sha256 = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
+ext.verifiedInput = { String name, String url, String digest, boolean base64 = false ->
+    def destination = new File(inputsDirectory, name)
+    if (!destination.exists()) {
+        inputsDirectory.mkdirs()
+        byte[] bytes = new URI(url).toURL().bytes
+        if (base64) bytes = Base64.decoder.decode(bytes)
+        if (sha256(bytes) != digest) throw new GradleException("Source checksum mismatch: ${name}")
+        def temporary = new File(inputsDirectory, name + '.part')
+        temporary.bytes = bytes
+        Files.move(temporary.toPath(), destination.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
+    if (sha256(destination.bytes) != digest) throw new GradleException("Cached source checksum mismatch: ${name}")
+    destination
+}
+
+ext.upstreamPom = new XmlSlurper().parse(verifiedInput("${module}-${upstreamVersion}.pom", upstreamBase + '.pom', modulePomSha256))
+repositories {
+    google()
+    mavenCentral()
+}
+dependencies {
+    upstreamPom.dependencies.dependency.each { dependency ->
+        def scope = dependency.scope.text() == 'compile' ? 'api' : 'implementation'
+        if (dependency.groupId.text() == 'com.android.tools.build' && dependency.artifactId.text() == 'builder-model') {
+            add(scope, project(':builder-model'))
+        } else {
+            add(scope, "${dependency.groupId.text()}:${dependency.artifactId.text()}:${dependency.version.text()}") {
+                // builder also depends on Google's model. The one source-built API replaces it.
+                exclude group: 'com.android.tools.build', module: 'builder-model'
+            }
+        }
+    }
+}
+configurations.compileClasspath.incoming.afterResolve {
+    def forbidden = configurations.compileClasspath.resolvedConfiguration.resolvedArtifacts.find {
+        it.moduleVersion.id.group == 'com.android.tools.build' && it.name in ['gradle', 'builder-model']
+    }
+    if (forbidden != null) throw new GradleException("Upstream implementation/model must not be a compiler input: ${forbidden.moduleVersion.id}")
+}
+
+tasks.register('prepareSources') {
+    inputs.files(rootProject.file(modulePatch), rootProject.file('releases.json'), project.buildFile,
+        rootProject.file('source-module.gradle'))
+    outputs.dir(sourceDirectory)
+    doLast {
+        def archive = verifiedInput("${module}-${upstreamVersion}-sources.jar", upstreamBase + '-sources.jar', moduleSourceSha256)
+        delete(sourceDirectory)
+        sourceDirectory.mkdirs()
+        new ZipFile(archive).withCloseable { zip ->
+            zip.entries().each { entry ->
+                if (entry.directory || entry.name == 'META-INF/MANIFEST.MF') return
+                // Normalize only identical generated-source copies; conflicting copies fail.
+                def name = entry.name.startsWith('java/') ? entry.name.substring(5) : entry.name
+                def destination = sourceDirectory.toPath().resolve(name).normalize()
+                if (!destination.startsWith(sourceDirectory.toPath())) throw new GradleException('Invalid source archive path')
+                byte[] bytes = zip.getInputStream(entry).withCloseable { it.bytes }
+                if (Files.exists(destination)) {
+                    if (!Arrays.equals(Files.readAllBytes(destination), bytes)) throw new GradleException("Conflicting source: ${name}")
+                } else {
+                    Files.createDirectories(destination.parent)
+                    Files.write(destination, bytes)
+                }
+            }
+        }
+        providers.exec {
+            workingDir rootProject.projectDir.parentFile
+            commandLine 'git', 'apply', "--directory=.work/agp/${sourceDirectory.name}", rootProject.file(modulePatch).absolutePath
+        }.result.get().assertNormalExitValue()
+        def provenance = new File(sourceDirectory, 'META-INF/zyntax-agp.properties')
+        provenance.parentFile.mkdirs()
+        provenance.text = "coordinate=${project.group}:${module}:${project.version}\nupstreamVersion=${upstreamVersion}\nsourceSha256=${moduleSourceSha256}\n"
+    }
+}
+
+sourceSets.main {
+    java.setSrcDirs([sourceDirectory])
+    resources.setSrcDirs([sourceDirectory])
+    resources.exclude('**/*.java', '**/*.kt')
+}
+kotlin.sourceSets.main.kotlin.setSrcDirs([sourceDirectory])
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+tasks.named('compileKotlin') { dependsOn 'prepareSources' }
+tasks.named('compileJava') { dependsOn 'prepareSources'; options.release = 11 }
+tasks.named('processResources') { dependsOn 'prepareSources' }
+tasks.withType(Jar).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+tasks.named('jar') {
+    manifest.attributes('Implementation-Title': "Zyntax Android-host ${module}",
+        'Implementation-Version': project.version, 'Plugin-Version': upstreamVersion)
+}
+def sourcesJar = tasks.register('sourcesJar', Jar) {
+    dependsOn 'prepareSources'
+    archiveClassifier = 'sources'
+    from(sourceDirectory)
+}
+publishing {
+    publications {
+        fork(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            pom {
+                name = "Zyntax Android-host ${module}"
+                description = "Whole-source Android-host build of ${module} ${upstreamVersion}."
+                licenses { license { name = 'Apache License, Version 2.0'; url = 'https://www.apache.org/licenses/LICENSE-2.0' } }
+            }
+        }
+    }
+    repositories { maven { url = rootProject.layout.buildDirectory.dir('repository') } }
+}

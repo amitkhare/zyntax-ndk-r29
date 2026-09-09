@@ -73,10 +73,12 @@ DevRelease APK/AAB builds also passed with test-only signing and Bundletool
 validation. R8 reduced DEX from 16,155,288 to 2,441,276 bytes. Generated app
 artifacts remain private and uninstalled; this is not a release-runtime test.
 
-The next AGP revision, `-zyntax.2`, adds typed missing-NDK sync diagnostics through
-AGP's existing reporter. All three source builds and the focused four-case USB
-check for 8.12.3 passed. It is not published and adds no app/SDK code or requirements
-model. CMake discovery and complete automatic setup remain unfinished.
+The unpublished AGP work adds typed missing-NDK diagnostics and finalized CMake
+settings through existing AGP models. The `-zyntax.2` NDK diagnostic check and
+`-zyntax.3` CMake model check passed on USB; all three exact AGP/model source
+builds passed. A shared recipe builds one public model dependency, without duplicate
+API classes. App/SDK are unchanged. Native package resolution and complete automatic
+setup remain unfinished; model values alone do not establish tool availability.
 
 The [Android-qualified Gradle distribution](gradle/distribution/README.md) is
 source-built and passes two-build USB native/terminal/watcher integration checks.
@@ -108,6 +110,7 @@ Distribution publication remains pending. No app or SDK code changed.
 - [x] Verify native terminal components and source-built Android Gradle integration.
 - [x] Enable and verify default F2FS watching in the Android distribution.
 - [x] Expose and verify typed missing-NDK sync diagnostics without weakening build errors.
+- [x] Expose and verify finalized CMake settings through the existing AGP public model.
 - [ ] Publish the verified Android Gradle distribution after release approval.
 
 Both sample projects now compile native libraries and produce verified signed

@@ -1,0 +1,56 @@
+diff --git a/com/android/builder/model/v2/models/AndroidDsl.kt b/com/android/builder/model/v2/models/AndroidDsl.kt
+--- a/com/android/builder/model/v2/models/AndroidDsl.kt
++++ b/com/android/builder/model/v2/models/AndroidDsl.kt
+@@ -19,3 +19,4 @@
+ import com.android.builder.model.v2.AndroidModel
+ import com.android.builder.model.v2.dsl.BuildType
++import com.android.builder.model.v2.dsl.CmakeOptions
+ import com.android.builder.model.v2.dsl.DependenciesInfo
+@@ -100,1 +101,7 @@
++    /**
++     * CMake configuration, or null when no CMake project path is configured.
++     * These values do not establish that native tools are available or valid.
++     */
++    val cmake: CmakeOptions?
++
+ }
+diff --git a/com/android/builder/model/v2/dsl/CmakeOptions.kt b/com/android/builder/model/v2/dsl/CmakeOptions.kt
+new file mode 100644
+--- /dev/null
++++ b/com/android/builder/model/v2/dsl/CmakeOptions.kt
+@@ -0,0 +1,35 @@
++/*
++ * Copyright (C) 2026 Zyntax
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++
++package com.android.builder.model.v2.dsl
++
++import com.android.builder.model.v2.AndroidModel
++import java.io.File
++
++/** CMake configuration values, not a tool availability or installation result. */
++interface CmakeOptions : AndroidModel {
++    /** The authored version, including any trailing '+', or null when omitted. */
++    val requestedVersion: String?
++
++    /**
++     * The source-defined AGP default. A valid custom installation without an authored version
++     * is not required to match this default.
++     */
++    val defaultVersion: String
++
++    /** The explicit cmake.dir value, without checking its existence or version. */
++    val customDirectory: File?
++}

@@ -74,6 +74,49 @@ The AGP candidate bytes were unchanged between runs. This verifies the scoped
 8.12.3 diagnostic contract, not CMake discovery, complete setup or native builds
 with the new revision. These new AGP artifacts are not published.
 
+## Finalized CMake settings
+
+The `-zyntax.3` AGP and public builder-model source builds passed for all three
+exact releases: 8.12.3 in 2m34s, 8.13.0 in 2m20s and 9.2.1 in 3m8s, with 18 tasks
+executed each. One shared build recipe prepares and publishes both source modules
+to a local Maven repository. These artifacts are not APT-packaged or published.
+
+| Fork | AGP runtime SHA-256 | Model runtime SHA-256 |
+| --- | --- | --- |
+| 8.12.3-zyntax.3 | `b60fc043ac09a82b1023eaca6559b79a86853f270dc343c4879ecc734fceb658` | `1ee1d2cd7ef76bef773dc85fee3f828f9ee2cb1dc0811c846005265d5c757e0a` |
+| 8.13.0-zyntax.3 | `078ab089730f7d3bc6b0d0c775098032800cd828d9a217b6453ce53e057f0995` | `3dc17f3432dbffdf32357aa16728e3513e77086fa6e6c8537e47940c2b84ad28` |
+| 9.2.1-zyntax.3 | `4c188a8c4d3e83db3fa85ff26d4fbf201936019ea0a7341158da4bfe8c3a6943` | `6a2220523c5346838de219597236d9150217a77b146600cbdbcc265b6c2d0346` |
+
+Archive checks found unique entries, no overlapping runtime classes, unchanged
+upstream NOTICE bytes and complete original source coverage. Public signature
+comparisons retained all original model classes/methods; only `CmakeOptions` and
+`AndroidDsl.getCmake()` were added. POM/module metadata selects one exact owned
+model and excludes the original peer. The model's Kotlin bytecode is JVM11 like
+its Java classes; upstream already declared a JVM11 module minimum.
+
+The corrected USB invocation passed in **242.804s / OK (1 test)**. Its two
+scalar-only model actions used the exact 8.12.3 candidate, previously verified
+Android Gradle provider and app-private Java21. Four library modules exercised
+later DSL finalizers: raw `3.31.6`, raw `3.30.5+`, omitted version, and removal of
+the CMake project path. Non-null CMake objects reported source default `3.22.1`;
+the no-CMake object stayed null. The second action added only a root `cmake.dir`
+pointing to an absent private path with spaces, and every applicable model
+reported that exact path without creating it.
+
+Variants were disabled through the public selector/Action callback. No native
+model or build task was requested, no CMake executable ran and no package was
+installed. Both actions retained genuine SDK boot classpaths and had no blocking
+sync issues. Original/copied SDK file hashes matched; the isolated Gradle daemon
+stopped and transfer resources were removed. App/SDK and user projects were unchanged.
+
+Evidence: `cmake-requirements.js6c6ljh/evidence` under the private app-home cache,
+harness `run-1867549174630434634/output.log`. Frozen input ZIP: 19,377,456 bytes,
+SHA-256 `a47ed33d8c7cbcd8452ef30d4648c345693635fd805df59b0b51a1c863d2c7bc`.
+The initial invocation failed before model retrieval because the private Groovy
+fixture omitted the callback's required selector. Only that fixture call was
+corrected; the AGP/model binaries were unchanged. This proves model-data transport,
+not CMake validation, native package availability, automatic setup or native builds.
+
 ## Zyntax DevDebug self-build
 
 The unchanged Zyntax 0.9.4 project at commit `58c36d7` completed on-device

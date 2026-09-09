@@ -1,11 +1,12 @@
 # Android-host Android Gradle Plugin
 
-Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1**, packaged under distinct
-coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.2`.
+Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1** and their public
+`builder-model` modules, under distinct coordinates
+`app.zyntax.tools.build:<module>:<upstream-version>-zyntax.3`.
 
-**Candidate status: `-zyntax.2` adds typed missing-NDK sync diagnostics. All three
-whole-module source builds passed; the four-case missing-NDK check passed on USB
-with 8.12.3. The new artifacts are local only, not APT-packaged or published.**
+**Candidate status: `-zyntax.3` exposes finalized CMake settings through AGP's
+existing public model. All three AGP/model source builds and the focused 8.12.3 USB
+model check passed. Artifacts are local only, not APT-packaged or published.**
 
 Historical `-zyntax.1` evidence: all three source builds passed. AGP 9.2.1 passed native sample builds;
 8.12.3 and 8.13.0 passed the complete unchanged Zyntax DevDebug self-build on USB.
@@ -48,7 +49,7 @@ compilation: Linux ARM64 selects the real
 `linux-arm64` toolchain directory for strip, objcopy and shared libc++. It adds
 no architecture aliases, runtime binary modification, app code or fallback.
 
-### Missing-NDK sync diagnostics (candidate)
+### Missing-NDK sync diagnostics
 
 The same locator change serves all three exact forks. After the existing NDK
 lookup/installation path fails, it reports `MISSING_SDK_PACKAGE` through the
@@ -64,7 +65,7 @@ alongside the unavailable-package issue. Consumers must aggregate project/global
 `ProjectSyncIssues` and refuse an install plan containing any other blocking error;
 the package data alone is not permission to repair or overwrite an installation.
 
-The fresh Windows/JDK 21 builds passed on 9 September 2026: 8.12.3 in 2m49s,
+The `-zyntax.2` Windows/JDK 21 builds passed on 9 September 2026: 8.12.3 in 2m49s,
 8.13.0 in 2m11s and 9.2.1 in 2m54s, with all nine tasks executed in each build.
 Runtime JARs retain `NOTICE`, exact upstream `Plugin-Version`, distinct fork
 metadata and unique entry paths. The source build uses fork-qualified work
@@ -75,6 +76,45 @@ ordinary configuration failure, corrupt SDK-managed NDK and invalid custom path.
 Existing SDK inputs retained their hashes; no package was installed. This does
 not verify CMake discovery or complete setup. See [the evidence](../docs/verification.md#missing-ndk-sync-diagnostics).
 
+### Finalized CMake settings
+
+`AndroidDsl.cmake` is null when no CMake project path is configured. Otherwise its
+three public getters preserve the authored nullable `requestedVersion` (including
+`+`), AGP's source-defined `defaultVersion`, and the nullable `customDirectory`
+from the existing `cmake.dir` provider. A custom installation without an authored
+version need not match the default. These are configuration values, not parsed
+SDK package IDs, an installation plan, or proof that a tool is usable.
+
+The producer reads the finalized DSL inside AGP's existing model builder, without
+an early callback snapshot, new model registry, native lookup or tool execution.
+Existing native locator validation and blocking sync issues remain authoritative.
+No CMake parser, alternate API reader, app code or extension-SDK change is added.
+
+The public API is compiled from each exact `builder-model` sources JAR. The shared
+`source-module.gradle` recipe owns checksum verification, source preparation,
+dependencies, resources and publication for both modules. AGP has one dependency
+on the owned model; its other published edges exclude Google's model. The selector
+also maps explicit model-classpath requests, and the peer's Gradle capabilities
+reject a conflicting second model rather than loading duplicate API classes.
+Maven POMs cannot express those capabilities; their exclusions are retained, and
+the supported Gradle consumers use the accompanying module metadata.
+
+Both modules preserve source Kotlin API/language 2.0 and compatibility default-method
+generation. The peer's Kotlin bytecode now targets JVM 11 alongside its Java classes;
+upstream already required JVM 11 through its Java classes and published metadata.
+Original notices and model version properties remain intact. No compiled upstream
+implementation or model classes are used as compiler/packaging inputs.
+
+The new Windows/JDK 21 source builds executed 18 tasks each: 8.12.3 in 2m34s,
+8.13.0 in 2m20s and 9.2.1 in 3m8s. Native CMake selection, package resolution and
+complete automatic setup remain separate unfinished work.
+
+One corrected USB invocation passed both model operations in 242.804s. Four
+disabled-variant modules retained their later-finalized exact, `+`, omitted and
+no-CMake values, first without and then with a root custom directory. No native
+tool was invoked or installed, and SDK hashes stayed unchanged. This verifies
+configuration transport only; see [the evidence](../docs/verification.md#finalized-cmake-settings).
+
 ## Build
 
 Requires PowerShell, Git and JDK 21. The shared recipe selects Gradle 8.13 for
@@ -84,8 +124,8 @@ under the ignored repository `.work/agp/` directory. The build uses at most two
 workers and a 3 GiB Gradle heap.
 
 Prepared sources, build outputs, project cache, Kotlin state and logs are keyed
-by the full fork version. The `-zyntax.2` candidate therefore uses fresh mutable
-work paths without overwriting verified `-zyntax.1` artifacts or logs. Exact
+by the full fork version. The `-zyntax.3` candidate therefore uses fresh mutable
+work paths without overwriting earlier artifacts or logs. Exact
 checksum-verified inputs/bootstrap distributions and dependency downloads remain
 shared; no private recipe copy or manual cache injection is needed.
 
@@ -96,8 +136,10 @@ shared; no private recipe copy or manual cache injection is needed.
 ```
 
 Output: `.work/agp/build-<fork-version>/libs/gradle-<fork-version>.jar`, where
-`<fork-version>` is, for example, `8.12.3-zyntax.2`. Prepared sources live in
-`.work/agp/sources-<fork-version>/`; the log is `.work/agp/build-<fork-version>.log`.
+`<fork-version>` is, for example, `8.12.3-zyntax.3`. Prepared AGP/model sources live
+under `.work/agp/` in `sources-<fork-version>/` and `builder-model-sources-<fork-version>/`.
+The peer's output is inside `build-<fork-version>/builder-model/`; both modules
+publish into the same local repository. The log is `.work/agp/build-<fork-version>.log`.
 Use `-Task publish` to write a **local** Maven repository under
 `.work/agp/build-<fork-version>/repository/`; this does not upload anything.
 Unknown upstream versions fail; no version substitutes for another.
@@ -147,7 +189,7 @@ It logs each requested AGP version, selected fork coordinate
 and repository. Exact versions and public plugin IDs come from `releases.json`,
 checked against the source plugin descriptors. Unknown versions and plugins
 removed from a selected release fail; unrelated plugin IDs are untouched.
-Only our module is resolved from the supplied repository; it is excluded from
+Only our AGP and model modules are resolved from the supplied repository; they are excluded from
 other declared repositories. Ordinary content filters allow projects to retain
 their own `buildscript.repositories` declarations.
 
@@ -155,7 +197,7 @@ This supports versioned `plugins {}` requests, including version-catalog aliases
 and versions declared through `pluginManagement`. For `buildscript` declarations,
 public `beforeProject` and classpath `resolutionStrategy.eachDependency` hooks
 select the exact fork with `useTarget`, using the same release mapping and logs.
-Only `com.android.tools.build:gradle` classpath dependencies are selected;
+Only `com.android.tools.build:gradle` and `builder-model` classpath dependencies are selected;
 unrelated dependencies and already-loaded plugin classes are not replaced.
 Unversioned child plugin requests retain Gradle's normal inherited-classpath
 resolution; the script does not select a new artifact for them.
@@ -199,8 +241,8 @@ directory, unchanged revision, and rejection of a mismatched revision.
 
 AGP remains Apache-2.0 with its original bundled notices. The source change uses
 that license; original build infrastructure follows the repository [LICENSE](../LICENSE).
-The sources artifact generated by this recipe contains all prepared sources,
-resources and source-provenance metadata. No app sources or private keys are used.
+The sources artifacts generated by this recipe contain all prepared sources,
+resources and source-provenance metadata for each module. No app sources or private keys are used.
 
 Primary inputs: [Google's 8.12.3 sources](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.12.3/gradle-8.12.3-sources.jar),
 [8.12.3 POM](https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/8.12.3/gradle-8.12.3.pom),
