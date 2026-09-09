@@ -18,3 +18,66 @@ diff --git a/com/android/build/gradle/internal/ndk/NdkR25Info.kt b/com/android/b
 +            else -> error("Unsupported NDK host operating system: ${System.getProperty("os.name")}")
          }
      }
+diff --git a/com/android/build/gradle/internal/cxx/configure/NdkLocator.kt b/com/android/build/gradle/internal/cxx/configure/NdkLocator.kt
+--- a/com/android/build/gradle/internal/cxx/configure/NdkLocator.kt
++++ b/com/android/build/gradle/internal/cxx/configure/NdkLocator.kt
+@@ -39,7 +39,6 @@ import com.android.utils.cxx.CxxDiagnosticCode.NDK_VERSION_IS_UNMATCHED
+ import com.android.utils.cxx.CxxDiagnosticCode.NDK_VERSION_IS_UNMATCHED
+ import com.android.utils.cxx.CxxDiagnosticCode.NDK_VERSION_UNSUPPORTED
+ import com.google.common.annotations.VisibleForTesting
+-import org.gradle.api.InvalidUserDataException
+ import org.gradle.api.provider.ProviderFactory
+ import java.io.File
+ 
+@@ -72,7 +71,8 @@ fun findNdkPathImpl(
+     sdkFolder: File?,
+     ndkVersionedFolderNames: List<String>,
+     getNdkSourceProperties: (File) -> SdkSourceProperties?,
+-    sdkHandler: SdkHandler?
++    sdkHandler: SdkHandler?,
++    issueReporter: IssueReporter
+ ): NdkLocatorRecord? {
+     // Record status of user-supplied information
+     logUserInputs(
+@@ -157,7 +157,8 @@ fun findNdkPathImpl(
+                         sdkFolder,
+                         ndkVersionedFolderNames,
+                         getNdkSourceProperties,
+-                        sdkHandler = null // Don't want to download hypothetical NDK
++                        sdkHandler = null, // Don't want to download hypothetical NDK
++                        issueReporter = issueReporter
+                     )
+                     if (resolutionWithoutNdkDir == resolutionWithNdkDir) {
+                         infoln("Deleting ndk.dir and setting android.ndkVersion to " +
+@@ -246,13 +247,14 @@ fun findNdkPathImpl(
+         return NdkLocatorRecord(downloaded, revisionFromNdkVersion)
+     }
+ 
+-    // Throw error expected by Android Studio. If the text isn't this, then Android Studio won't
+-    // recognize the error and provide hyperlink to install NDK.
+-    // TODO(b/131320700) convert to errorln(..) which requires co-updating Android Studio.
+-    throw InvalidUserDataException(
+-        "NDK not configured. Download " +
+-                "it with SDK manager. Preferred NDK version is " +
+-                "'$NDK_DEFAULT_VERSION'. ")
++    // Modified by Zyntax: normal builds fail through the existing issue reporter;
++    // IDE sync retains a blocking package issue without fabricating native configuration.
++    issueReporter.reportError(
++        IssueReporter.Type.MISSING_SDK_PACKAGE,
++        "NDK $revisionFromNdkVersion could not be located or installed.",
++        "$FD_NDK_SIDE_BY_SIDE;$revisionFromNdkVersion"
++    )
++    return null
+ }
+ 
+ /**
+@@ -429,7 +431,8 @@ data class NdkLocator(
+             sdkPath,
+             getNdkVersionedFolders(File(sdkPath, FD_NDK_SIDE_BY_SIDE)),
+             ::getNdkVersionInfo,
+-            if (downloadOkay) sdkHandler else null
++            if (downloadOkay) sdkHandler else null,
++            issueReporter
+         )
+     }
+ }

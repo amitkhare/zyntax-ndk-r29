@@ -30,6 +30,50 @@ the requested small C++/CMake addition, with `ndkVersion = 29.0.14206865`.
 Native CMake selection uses `cmake.dir`; AGP fork selection is explicit through
 the documented init script. No desktop host-directory aliases or binary edits.
 
+## Missing-NDK sync diagnostics
+
+On 9 September 2026, the `-zyntax.2` AGP source builds passed for 8.12.3, 8.13.0
+and 9.2.1. Each used fresh fork-qualified work directories and executed nine
+tasks; upstream plugin versions and notices were preserved. The local runtime
+JARs have unique entry paths and these SHA-256 identities:
+
+| Fork | Runtime JAR SHA-256 |
+| --- | --- |
+| 8.12.3-zyntax.2 | `ed39858233b46c2ef83cd186aa4d7e43e5771005fec8de21ab4af711f4be930d` |
+| 8.13.0-zyntax.2 | `6357de2fb09a8a80ae5e680257279e9f1955c7aa906436f0802989a3ad9b3631` |
+| 9.2.1-zyntax.2 | `d2eb6ee6420672446d0eb08f094227a26548a86af4ea488032ff564921484cab` |
+
+One corrected USB run passed all four configuration-only cases in **261.869s**
+(`OK (1 test)`). It selected the 8.12.3 fork explicitly with the native-verified
+Android Gradle `8.14.3-android-1-20260909081124+0000` and app-private Java 21.
+An isolated SDK copied genuine platform 36 and build-tools 35.0.0; downloads
+were disabled and no Gradle build task was requested.
+
+- A later DSL finalizer selected NDK 29.0.14206865. V2 sync returned exact
+  `MISSING_SDK_PACKAGE` data `ndk;29.0.14206865`, a real SDK boot classpath and
+  an absent native model. The only other issue was a platform-tools warning.
+- STANDARD configuration failed through the existing reporter. The private
+  check required the public `BuildActionFailureException` plus the exact typed
+  AGP Problems event. Only this diagnostic operation enabled AGP's existing
+  experimental Problems reporting; ordinary V2 cases did not use that flag.
+- An empty SDK-managed NDK directory retained its blocking native-configuration
+  error. A missing explicit custom path likewise stayed blocking and produced
+  no SDK NDK installation request. Neither was treated as install-only setup.
+
+Original and copied SDK file hashes remained unchanged. The deliberately empty
+NDK directory stayed empty; no packages or native models were fabricated. The
+private Gradle daemon stopped, and USB transfer resources were removed.
+
+Private evidence: `native-requirements.nf1mxudb/evidence` under the app-home
+build-check cache; harness log `run-4698908419010670703/output.log`.
+The tested input ZIP SHA-256 is
+`443149e36826d0fb9f1d4deafa008b62cdce06e4cb8ddf56b9ed4df94e0af9b0`.
+The initial run passed missing-NDK sync but expected the wrong Tooling API
+exception wrapper in STANDARD mode; only the private assertion was corrected.
+The AGP candidate bytes were unchanged between runs. This verifies the scoped
+8.12.3 diagnostic contract, not CMake discovery, complete setup or native builds
+with the new revision. These new AGP artifacts are not published.
+
 ## Zyntax DevDebug self-build
 
 The unchanged Zyntax 0.9.4 project at commit `58c36d7` completed on-device

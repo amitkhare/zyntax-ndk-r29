@@ -14,9 +14,9 @@ group = 'app.zyntax.tools.build'
 def release = gradle.ext.agpRelease
 def upstreamVersion = release.version
 version = release.forkVersion
-layout.buildDirectory = file("../.work/agp/build-${upstreamVersion}")
+layout.buildDirectory = file("../.work/agp/build-${version}")
 def inputsDirectory = file('../.work/agp/inputs')
-def sourceDirectory = file("../.work/agp/sources-${upstreamVersion}")
+def sourceDirectory = file("../.work/agp/sources-${version}")
 def upstreamBase = "https://dl.google.com/dl/android/maven2/com/android/tools/build/gradle/${upstreamVersion}/gradle-${upstreamVersion}"
 def sourceDigest = release.sourceSha256
 def sha256 = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
@@ -114,7 +114,7 @@ def prepareSources = tasks.register('prepareSources') {
         }
         providers.exec {
             workingDir projectDir.parentFile
-            commandLine 'git', 'apply', "--directory=.work/agp/sources-${upstreamVersion}", new File(projectDir, release.patch).absolutePath
+            commandLine 'git', 'apply', "--directory=.work/agp/sources-${version}", new File(projectDir, release.patch).absolutePath
         }.result.get().assertNormalExitValue()
         def aaptProperties = new File(sourceDirectory, 'com/android/build/gradle/internal/res/aapt2_version.properties')
         aaptProperties.parentFile.mkdirs()

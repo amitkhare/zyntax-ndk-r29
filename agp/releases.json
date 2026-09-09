@@ -1,6 +1,6 @@
 {
   "8.12.3": {
-    "forkVersion": "8.12.3-zyntax.1",
+    "forkVersion": "8.12.3-zyntax.2",
     "pluginIds": [
       "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
       "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",
@@ -22,7 +22,7 @@
     "patch": "ndk-host.patch"
   },
   "8.13.0": {
-    "forkVersion": "8.13.0-zyntax.1",
+    "forkVersion": "8.13.0-zyntax.2",
     "pluginIds": [
       "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
       "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",
@@ -44,7 +44,7 @@
     "patch": "ndk-host.patch"
   },
   "9.2.1": {
-    "forkVersion": "9.2.1-zyntax.1",
+    "forkVersion": "9.2.1-zyntax.2",
     "pluginIds": [
       "com.android.ai-pack", "com.android.application", "com.android.asset-pack-bundle",
       "com.android.asset-pack", "com.android.base", "com.android.dynamic-feature",

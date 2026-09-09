@@ -1,15 +1,19 @@
 # Android-host Android Gradle Plugin
 
 Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1**, packaged under distinct
-coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.1`.
+coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.2`.
 
-**Status: all three source builds passed. AGP 9.2.1 passed native sample builds;
+**Candidate status: `-zyntax.2` adds typed missing-NDK sync diagnostics. All three
+whole-module source builds passed; the four-case missing-NDK check passed on USB
+with 8.12.3. The new artifacts are local only, not APT-packaged or published.**
+
+Historical `-zyntax.1` evidence: all three source builds passed. AGP 9.2.1 passed native sample builds;
 8.12.3 and 8.13.0 passed the complete unchanged Zyntax DevDebug self-build on USB.
 AGP package 1.0.0-2 is published at `pkg.zyntax.app`; signed indexes and downloaded
-package bytes were verified on USB.**
+package bytes were verified on USB. Those results do not validate the new candidate.
 See [verification](../docs/verification.md).
 
-The Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
+The `-zyntax.1` Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
 top-level class names as their exact Google releases: 2,377 for 8.12.3, 2,388 for
 8.13.0 and 2,413 for 9.2.1, with no missing, extra or duplicate paths. Their source
 archives contain 1,827, 1,835 and 1,826 unique Java/Kotlin files, without binary classes
@@ -39,10 +43,37 @@ AAPT2 metadata is generated from the exact POM's AAPT2 version. Existing source
 notices, plugin descriptors and API version metadata are preserved. The missing
 AI-pack descriptor is generated from the upstream plugin declaration.
 
-The version-specific source diffs change only native host selection before
+The version-specific source diffs include native host selection before
 compilation: Linux ARM64 selects the real
 `linux-arm64` toolchain directory for strip, objcopy and shared libc++. It adds
 no architecture aliases, runtime binary modification, app code or fallback.
+
+### Missing-NDK sync diagnostics (candidate)
+
+The same locator change serves all three exact forks. After the existing NDK
+lookup/installation path fails, it reports `MISSING_SDK_PACKAGE` through the
+existing issue reporter with canonical `ndk;<parsed revision>` data. Normal
+evaluation still throws; IDE model-only sync records a blocking issue and uses
+the existing absent-native-configuration path. No native model, task data, version,
+or installation is fabricated, and upstream `Plugin-Version` remains unchanged.
+
+Earlier invalid-version, custom-path and conflicting-path diagnostics, installer
+exceptions, and no-download hypothetical lookups retain their existing behavior.
+A corrupt SDK-managed installation can retain a distinct blocking Cxx issue
+alongside the unavailable-package issue. Consumers must aggregate project/global
+`ProjectSyncIssues` and refuse an install plan containing any other blocking error;
+the package data alone is not permission to repair or overwrite an installation.
+
+The fresh Windows/JDK 21 builds passed on 9 September 2026: 8.12.3 in 2m49s,
+8.13.0 in 2m11s and 9.2.1 in 2m54s, with all nine tasks executed in each build.
+Runtime JARs retain `NOTICE`, exact upstream `Plugin-Version`, distinct fork
+metadata and unique entry paths. The source build uses fork-qualified work
+directories; verified `-zyntax.1` sources and artifacts were not overwritten.
+
+The focused 8.12.3 USB check passed in 261.869s: finalized missing-NDK data,
+ordinary configuration failure, corrupt SDK-managed NDK and invalid custom path.
+Existing SDK inputs retained their hashes; no package was installed. This does
+not verify CMake discovery or complete setup. See [the evidence](../docs/verification.md#missing-ndk-sync-diagnostics).
 
 ## Build
 
@@ -52,15 +83,23 @@ pinned SHA-256. Downloads, extracted sources, caches and output stay
 under the ignored repository `.work/agp/` directory. The build uses at most two
 workers and a 3 GiB Gradle heap.
 
+Prepared sources, build outputs, project cache, Kotlin state and logs are keyed
+by the full fork version. The `-zyntax.2` candidate therefore uses fresh mutable
+work paths without overwriting verified `-zyntax.1` artifacts or logs. Exact
+checksum-verified inputs/bootstrap distributions and dependency downloads remain
+shared; no private recipe copy or manual cache injection is needed.
+
 ```powershell
 ./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 8.12.3
 ./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 8.13.0
 ./agp/build.ps1 -JavaHome 'C:/path/to/jdk-21' -UpstreamVersion 9.2.1
 ```
 
-Output: `.work/agp/build-<version>/libs/gradle-<version>-zyntax.1.jar`.
+Output: `.work/agp/build-<fork-version>/libs/gradle-<fork-version>.jar`, where
+`<fork-version>` is, for example, `8.12.3-zyntax.2`. Prepared sources live in
+`.work/agp/sources-<fork-version>/`; the log is `.work/agp/build-<fork-version>.log`.
 Use `-Task publish` to write a **local** Maven repository under
-`.work/agp/build-<version>/repository/`; this does not upload anything.
+`.work/agp/build-<fork-version>/repository/`; this does not upload anything.
 Unknown upstream versions fail; no version substitutes for another.
 
 This does **not** automatically replace stock AGP in existing projects.
@@ -123,13 +162,13 @@ resolution; the script does not select a new artifact for them.
 Do not install the script globally or disable dependency verification. Without
 the explicit argument, the project continues to use its normal plugin selection.
 This is opt-in fork verification, not a claim that stock AGP supports Android hosts.
-Host-only configuration checks loaded both exact fork artifacts, including a
+For `-zyntax.1`, host-only configuration checks loaded both exact fork artifacts, including a
 root version-catalog alias with `apply false` repeated by an application module,
 an unversioned child inheriting that plugin, and a root buildscript classpath
 applied by a child application. Unsupported versions are rejected. These checks
 did not compile an Android project or run native tools.
 
-On USB, AGP 9.2.1 subsequently built native debug/release APKs and release AABs
+With `-zyntax.1` on USB, AGP 9.2.1 subsequently built native debug/release APKs and release AABs
 for both Groovy and Kotlin DSL sample projects. AGP 8.12.3 compiled the unchanged
 Zyntax JNI component in a private minimal library project using buildscript
 classpath selection. The later full Zyntax 0.9.4 DevDebug self-build passed with
@@ -153,7 +192,7 @@ ndk-build path. Their effective `ndkVersion` must match the selected revision;
 mismatches fail without changing that version. Non-native modules retain their
 NDK settings, including unused AGP defaults. Omitting the argument leaves NDK
 selection unchanged. No symlinks, `ndk.dir`, project-file edits or environment
-rewrites are used. Focused host configuration checks verified the selected
+rewrites are used. For `-zyntax.1`, focused host configuration checks verified the selected
 directory, unchanged revision, and rejection of a mismatched revision.
 
 ## License and source
@@ -176,5 +215,5 @@ recorded in [releases.json](releases.json); shared resource checksums are in
 AGP 8.13.0's [immutable upstream release metadata](https://android.googlesource.com/platform/tools/base/+/7dee427b8411d0356b29aad83651db2612f9340b/common/release_version.bzl)
 and [Maven catalog](https://android.googlesource.com/platform/tools/base/+/7dee427b8411d0356b29aad83651db2612f9340b/bazel/maven/artifacts.bzl)
 confirm Kotlin compiler/Gradle plugin 2.2.0, JaCoCo 0.8.13 and Dokka 1.4.32.
-Its NDK host-selection source is identical to 8.12.3, so both use the same
+Its NDK host-selection and locator sources are identical to 8.12.3, so both use the same
 `ndk-host.patch` without an additional version-specific source diff.
