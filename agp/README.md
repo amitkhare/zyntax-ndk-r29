@@ -3,9 +3,10 @@
 Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1**, packaged under distinct
 coordinates `app.zyntax.tools.build:gradle:<upstream-version>-zyntax.1`.
 
-**Status: all three source builds passed. AGP 8.12.3 and 9.2.1 also passed focused
-USB native builds and signed installation through the optional `zyntax-agp`
-package at `pkg.zyntax.app`. AGP 8.13.0 whole-app USB verification is pending.**
+**Status: all three source builds passed. AGP 9.2.1 passed native sample builds;
+8.12.3 and 8.13.0 passed the complete unchanged Zyntax DevDebug self-build on USB.
+AGP package 1.0.0-2 is published at `pkg.zyntax.app`; signed indexes and downloaded
+package bytes were verified on USB.**
 See [verification](../docs/verification.md).
 
 The Windows/JDK 21 builds passed on 2026-09-09. The runtime JARs have the same
@@ -131,7 +132,12 @@ did not compile an Android project or run native tools.
 On USB, AGP 9.2.1 subsequently built native debug/release APKs and release AABs
 for both Groovy and Kotlin DSL sample projects. AGP 8.12.3 compiled the unchanged
 Zyntax JNI component in a private minimal library project using buildscript
-classpath selection. The latter is not a full Zyntax app build.
+classpath selection. The later full Zyntax 0.9.4 DevDebug self-build passed with
+its original AGP 8.12.3 root and AGP 8.13.0 Capacitor module requests, each selected
+through the explicit release map. Gradle 8.14.3, JDK 21.0.12, SDK 36, build-tools
+35.0.0, packaged NDK r29 and native AAPT2 produced the signed APK without app or
+SDK source changes. Signing keys stayed under `~/.secrets`; the APK was not
+installed or published. See [the full build evidence](../docs/verification.md#zyntax-devdebug-self-build).
 
 ### Explicit NDK directory
 

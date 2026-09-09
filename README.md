@@ -3,9 +3,10 @@
 An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: native-build NDK r29 and both AGP forks are published as optional
-packages at `pkg.zyntax.app`. USB builds, signing and signed-repository installation
-passed.** See [verification](docs/verification.md) and [installation](agp/README.md#explicit-project-selection).
+**Status: native-build NDK r29 and three exact AGP forks passed USB builds,
+including a full Zyntax DevDebug self-build. Optional toolchain packages are
+published at `pkg.zyntax.app`; signed indexes and AGP package 1.0.0-2 downloads
+were verified on USB.** See [verification](docs/verification.md) and [installation](agp/README.md#explicit-project-selection).
 
 ## Design
 
@@ -62,10 +63,12 @@ checksum-pinned shared package dependencies; it is not compiled or verified yet.
 Profiling and shader tools
 from the desktop bundle are outside the initial native-build package.
 
-The [AGP source build](agp/README.md) compiles versions 8.12.3 and 9.2.1 under
-distinct Maven coordinates. Both source builds, local packaging and explicit
-Gradle selection passed host checks. AGP 9.2.1 built both native sample projects
-on Android; AGP 8.12.3 built the unchanged Zyntax JNI component separately.
+The [AGP source build](agp/README.md) compiles versions 8.12.3, 8.13.0 and 9.2.1
+under distinct Maven coordinates. All three source builds and local packaging
+passed host checks. AGP 9.2.1 built both native sample projects on Android.
+AGP 8.12.3 and 8.13.0 then built the complete unchanged Zyntax 0.9.4 DevDebug
+project with its declared NDK r29 and Gradle 8.14.3 wrapper. Native compilation,
+stripping, signing and APK checks passed; the APK was not installed or published.
 
 ## Roadmap
 
@@ -83,7 +86,8 @@ on Android; AGP 8.12.3 built the unchanged Zyntax JNI component separately.
       projects under the app's `~/.secrets`.
 - [x] Compile the unchanged Zyntax JNI component using packaged NDK r29 and
       explicit AGP 8.12.3 selection, without publishing an app APK.
-- [ ] Verify Zyntax's Android project with its declared r29; do not publish APKs.
+- [x] Verify Zyntax's complete Android project with its declared r29; do not
+      install or publish the generated APK.
 - [x] Publish the verified packages and check signed repository installation.
 
 Both sample projects now compile native libraries and produce verified signed
