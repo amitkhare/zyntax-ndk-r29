@@ -73,9 +73,10 @@ DevRelease APK/AAB builds also passed with test-only signing and Bundletool
 validation. R8 reduced DEX from 16,155,288 to 2,441,276 bytes. Generated app
 artifacts remain private and uninstalled; this is not a release-runtime test.
 
-The separate [Gradle native component port](gradle/README.md) passes Android
-JNI and filesystem-event checks. A complete Android Gradle distribution,
-including terminal services and explicit selection, is still in progress.
+The [Android-qualified Gradle distribution](gradle/distribution/README.md) is
+source-built and passes two-build USB native/terminal/watcher integration checks.
+F2FS retention was tested with explicit watching; default F2FS support and
+distribution publication remain unfinished. No app or SDK code changed.
 
 ## Roadmap
 
@@ -98,7 +99,9 @@ including terminal services and explicit selection, is still in progress.
 - [x] Publish the verified packages and check signed repository installation.
 - [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
 - [x] Verify source-built Android Gradle native-platform and file-events components.
-- [ ] Complete native terminal services and Android Gradle distribution integration.
+- [x] Verify native terminal components and source-built Android Gradle integration.
+- [ ] Enable and verify default F2FS watching in the Android distribution.
+- [ ] Publish the verified Android Gradle distribution after release approval.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
