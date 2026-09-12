@@ -195,7 +195,17 @@ the executable. The corrected expression returned `HARD_CONFIGURE`, identifying
 returned `NO_CONFIGURE`, including the next run after recording the new fingerprint.
 
 This verifies cache invalidation, not native execution or a complete APK build on
-the user's Full device. Package publication and live verification are pending.
+the user's Full device.
+
+AGP package `1.0.0-4` records source commit
+[`875f01a`](https://github.com/amitkhare/zyntax-ndk-r29/commit/875f01afcef4841c70b4663afd58471aee32f55a).
+Packaging verified all 24 Maven artifacts, 96 checksum sidecars and six retained
+upstream notices. Published at `pkg.zyntax.app`: 30,242,484 bytes, SHA-256
+`6be3a79a7f659e937c71b370bfce8543a73f627c4eab98060ea64ab5988ad6cd`.
+Both live signature forms, all index variants and all seven indexed package sizes
+verified. The downloaded archive matched that hash. All six previous package
+records retained their filenames, sizes and hashes; only the new AGP revision
+was added. No NDK/compiler package or app/SDK source changed.
 
 ## Distribution audit
 

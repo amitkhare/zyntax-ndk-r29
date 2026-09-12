@@ -10,11 +10,12 @@ same revision now regenerates native commands through AGP's existing hard-config
 path instead of reusing commands for the previous installation. One shared source
 patch covers all three forks. No project cleanup hook, app or SDK change is used.
 All three AGP/model source builds and the focused host cache-invalidation regression
-passed. APT publication is pending; see [verification](../docs/verification.md#native-command-cache-invalidation).
+passed. **Published as APT package `1.0.0-4`**, with signed live indexes and
+downloaded bytes verified. See [verification](../docs/verification.md#native-command-cache-invalidation).
 
-**Published as APT package `1.0.0-3`: `-zyntax.3` exposes finalized CMake settings through AGP's
+Historical APT package `1.0.0-3`: `-zyntax.3` exposes finalized CMake settings through AGP's
 existing public model. All three AGP/model source builds and the focused 8.12.3 USB
-model check passed. Package contents, signed live indexes and downloaded bytes verified.**
+model check passed. Package contents, signed live indexes and downloaded bytes verified.
 
 Historical `-zyntax.1` evidence: all three source builds passed. AGP 9.2.1 passed native sample builds;
 8.12.3 and 8.13.0 passed the complete unchanged Zyntax DevDebug self-build on USB.
@@ -138,7 +139,7 @@ under the ignored repository `.work/agp/` directory. The build uses at most two
 workers and a 3 GiB Gradle heap.
 
 Prepared sources, build outputs, project cache, Kotlin state and logs are keyed
-by the full fork version. The `-zyntax.3` candidate therefore uses fresh mutable
+by the full fork version. The `-zyntax.4` release therefore uses fresh mutable
 work paths without overwriting earlier artifacts or logs. Exact
 checksum-verified inputs/bootstrap distributions and dependency downloads remain
 shared; no private recipe copy or manual cache injection is needed.
@@ -150,7 +151,7 @@ shared; no private recipe copy or manual cache injection is needed.
 ```
 
 Output: `.work/agp/build-<fork-version>/libs/gradle-<fork-version>.jar`, where
-`<fork-version>` is, for example, `8.12.3-zyntax.3`. Prepared AGP/model sources live
+`<fork-version>` is, for example, `8.12.3-zyntax.4`. Prepared AGP/model sources live
 under `.work/agp/` in `sources-<fork-version>/` and `builder-model-sources-<fork-version>/`.
 The peer's output is inside `build-<fork-version>/builder-model/`; both modules
 publish into the same local repository. The log is `.work/agp/build-<fork-version>.log`.

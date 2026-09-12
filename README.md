@@ -88,7 +88,8 @@ publication; this does not extend the scoped device-model results to native buil
 
 AGP `-zyntax.4` corrects native metadata invalidation when the selected NDK
 location changes without changing its revision. All three source builds and the
-focused host cache-invalidation regression passed; APT publication is pending.
+focused host cache-invalidation regression passed. APT package `1.0.0-4` is
+published; signed live indexes and the downloaded package bytes verified.
 App and SDK code are unchanged. See the [verification record](docs/verification.md#native-command-cache-invalidation).
 
 - [x] Inspect the r29 candidate and reject static tools and fallback wrappers.
