@@ -1,6 +1,6 @@
 {
   "8.12.3": {
-    "forkVersion": "8.12.3-zyntax.3",
+    "forkVersion": "8.12.3-zyntax.4",
     "modelSourceSha256": "568abe215d4c91d07b3c965cfc01c5398166f4a9199d37039fcf1ea86bd8e0e8",
     "modelPomSha256": "39df7a890896c777e7bc8f13e69f8ab1e6c428f0c00448a6ec6760650d519193",
     "pluginIds": [
@@ -24,7 +24,7 @@
     "patch": "ndk-host.patch"
   },
   "8.13.0": {
-    "forkVersion": "8.13.0-zyntax.3",
+    "forkVersion": "8.13.0-zyntax.4",
     "modelSourceSha256": "d0da518dbb44773453e63483f76ba51a62a62438dd3f4bee1b8554d5ad6c4261",
     "modelPomSha256": "555f48b9a9d0994a80cb5c94590a7da36acb9c5526e76f093a207490a2149255",
     "pluginIds": [
@@ -48,7 +48,7 @@
     "patch": "ndk-host.patch"
   },
   "9.2.1": {
-    "forkVersion": "9.2.1-zyntax.3",
+    "forkVersion": "9.2.1-zyntax.4",
     "modelSourceSha256": "a36a5de610ce6809649b130749ff0fa36af24521020bc72bbe2d66ac0d1081f7",
     "modelPomSha256": "a16e78ff2506d06436c03a08bfae979e3ca41d297fc3f623ccc6a268aa87efa7",
     "pluginIds": [

@@ -14,6 +14,8 @@ def workDirectory = rootProject.file('../.work/agp')
 layout.buildDirectory = new File(workDirectory, "build-${version}" + (project == rootProject ? '' : "/${module}"))
 ext.sourceDirectory = new File(workDirectory, (project == rootProject ? 'sources' : "${module}-sources") + "-${version}")
 def inputsDirectory = new File(workDirectory, 'inputs')
+def sourcePatches = [rootProject.file(modulePatch)]
+if (project == rootProject) sourcePatches.add(rootProject.file('native-command.patch'))
 def upstreamBase = "https://dl.google.com/dl/android/maven2/com/android/tools/build/${module}/${upstreamVersion}/${module}-${upstreamVersion}"
 def sha256 = { byte[] bytes -> MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() }
 ext.verifiedInput = { String name, String url, String digest, boolean base64 = false ->
@@ -57,7 +59,7 @@ configurations.compileClasspath.incoming.afterResolve {
 }
 
 tasks.register('prepareSources') {
-    inputs.files(rootProject.file(modulePatch), rootProject.file('releases.json'), project.buildFile,
+    inputs.files(sourcePatches, rootProject.file('releases.json'), project.buildFile,
         rootProject.file('source-module.gradle'))
     outputs.dir(sourceDirectory)
     doLast {
@@ -82,7 +84,7 @@ tasks.register('prepareSources') {
         }
         providers.exec {
             workingDir rootProject.projectDir.parentFile
-            commandLine 'git', 'apply', "--directory=.work/agp/${sourceDirectory.name}", rootProject.file(modulePatch).absolutePath
+            commandLine(['git', 'apply', "--directory=.work/agp/${sourceDirectory.name}"] + sourcePatches.collect { it.absolutePath })
         }.result.get().assertNormalExitValue()
         def provenance = new File(sourceDirectory, 'META-INF/zyntax-agp.properties')
         provenance.parentFile.mkdirs()

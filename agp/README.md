@@ -2,7 +2,15 @@
 
 Whole-module source builds of **AGP 8.12.3, 8.13.0 and 9.2.1** and their public
 `builder-model` modules, under distinct coordinates
-`app.zyntax.tools.build:<module>:<upstream-version>-zyntax.3`.
+`app.zyntax.tools.build:<module>:<upstream-version>-zyntax.4`.
+
+The `-zyntax.4` release includes the selected configure executable's absolute
+path in native metadata invalidation. Moving between NDK installations of the
+same revision now regenerates native commands through AGP's existing hard-configure
+path instead of reusing commands for the previous installation. One shared source
+patch covers all three forks. No project cleanup hook, app or SDK change is used.
+All three AGP/model source builds and the focused host cache-invalidation regression
+passed. APT publication is pending; see [verification](../docs/verification.md#native-command-cache-invalidation).
 
 **Published as APT package `1.0.0-3`: `-zyntax.3` exposes finalized CMake settings through AGP's
 existing public model. All three AGP/model source builds and the focused 8.12.3 USB

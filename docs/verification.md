@@ -178,6 +178,25 @@ These checks validate build/signature/package output, not optimized-app runtime
 behavior or Play acceptance. Source, signing inputs and generated app artifacts
 are not included in this public repository.
 
+## Native command cache invalidation
+
+On 12 September 2026, all three AGP/public-model `-zyntax.4` source builds passed
+on Windows/JDK 21: 8.12.3 in 2m46s, 8.13.0 in 2m22s and 9.2.1 in 1m56s,
+executing 18 tasks each. The shared patch adds the absolute configure executable
+to the existing `metadata_generation_command.txt` fingerprint. No project cache
+deletion, native launcher changes, app code or SDK changes are involved.
+
+One focused 26-second host regression compiled the exact command expressions
+extracted from the prepared old/new production source, then used compiled AGP's
+configuration fingerprint/invalidation APIs. Arguments and NDK revision stayed
+unchanged. The old expression incorrectly returned `NO_CONFIGURE` after relocating
+the executable. The corrected expression returned `HARD_CONFIGURE`, identifying
+`metadata_generation_command.txt` with `softConfigureOkay=false`. Unchanged paths
+returned `NO_CONFIGURE`, including the next run after recording the new fingerprint.
+
+This verifies cache invalidation, not native execution or a complete APK build on
+the user's Full device. Package publication and live verification are pending.
+
 ## Distribution audit
 
 The native-build distribution preserves Google's original notices and target
