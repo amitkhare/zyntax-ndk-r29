@@ -1,5 +1,10 @@
 # Native-build verification
 
+AGP source/history/cache moved to the separate
+[zyntax-agp repository](https://github.com/amitkhare/zyntax-agp) on 2026-09-19.
+AGP-specific entries below are historical evidence for their exact original
+artifacts, not claims about new builds from the relocated recipes.
+
 Focused Android ARM64 USB checks completed on 2026-09-09. Execution used the
 existing app-private runtime; no UI navigation, app/SDK changes or app release.
 

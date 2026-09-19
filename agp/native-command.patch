@@ -1,8 +1,0 @@
-diff --git a/com/android/build/gradle/tasks/ExternalNativeJsonGenerator.kt b/com/android/build/gradle/tasks/ExternalNativeJsonGenerator.kt
---- a/com/android/build/gradle/tasks/ExternalNativeJsonGenerator.kt
-+++ b/com/android/build/gradle/tasks/ExternalNativeJsonGenerator.kt
-@@ -163,3 +163,4 @@
-+                        Executable: ${processBuilder.executable.absolutePath}
-                         ${processBuilder.argsText()}
-                         Build command args: ${abi.getBuildCommandArguments()}
-                         Version: $ANDROID_GRADLE_BUILD_VERSION

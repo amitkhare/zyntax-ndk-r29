@@ -3,10 +3,10 @@
 An Android-ARM64 host port of NDK **r29 / 29.0.14206865**. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: native-build NDK r29 and three exact AGP forks passed USB builds,
-including full Zyntax DevDebug and R8-enabled DevRelease self-builds. Optional toolchain packages are
-published at `pkg.zyntax.app`; signed indexes and AGP package 1.0.0-2 downloads
-were verified on USB.** See [verification](docs/verification.md) and [installation](agp/README.md#explicit-project-selection).
+**Status: native-build NDK r29 passed USB CMake/ndk-build checks and Android
+APK/AAB builds. Its optional package is published at `pkg.zyntax.app`.** See
+[verification](docs/verification.md). AGP is a different tool and is maintained
+in the separate [zyntax-agp repository](https://github.com/amitkhare/zyntax-agp).
 
 ## Design
 
@@ -30,6 +30,8 @@ an external executable. It is not the source of release host binaries here.
 - `zyntax-packages-repo`: signed APT publication at `pkg.zyntax.app`.
 - [`zyntax-gradle`](https://github.com/amitkhare/zyntax-gradle): separate Android
   Gradle runtime sources, build recipes and distribution releases.
+- [`zyntax-agp`](https://github.com/amitkhare/zyntax-agp): separate Android Gradle
+  Plugin and public model source builds, exact-version selector and AGP caches.
 - App/SDK: unchanged. Studio UI is deferred until the toolchain works headlessly.
 
 ## Build the compiler
@@ -65,32 +67,13 @@ checksum-pinned shared package dependencies; it is not compiled or verified yet.
 Profiling and shader tools
 from the desktop bundle are outside the initial native-build package.
 
-The [AGP source build](agp/README.md) compiles versions 8.12.3, 8.13.0 and 9.2.1
-under distinct Maven coordinates. All three source builds and local packaging
-passed host checks. AGP 9.2.1 built both native sample projects on Android.
-AGP 8.12.3 and 8.13.0 then built the complete unchanged Zyntax 0.9.4 DevDebug
-project with its declared NDK r29 and Gradle 8.14.3 wrapper. Native compilation,
-stripping, signing and APK checks passed; the APK was not installed or published.
-DevRelease APK/AAB builds also passed with test-only signing and Bundletool
-validation. R8 reduced DEX from 16,155,288 to 2,441,276 bytes. Generated app
-artifacts remain private and uninstalled; this is not a release-runtime test.
-
-AGP package `1.0.0-3` adds typed missing-NDK diagnostics and finalized CMake
-settings through existing AGP models. The `-zyntax.2` NDK diagnostic check and
-`-zyntax.3` CMake model check passed on USB; all three exact AGP/model source
-builds passed. A shared recipe builds one public model dependency, without duplicate
-API classes. App/SDK are unchanged. Native package resolution and complete automatic
-setup remain unfinished; model values alone do not establish tool availability.
-The signed live indexes and exact downloaded package bytes were verified after
-publication; this does not extend the scoped device-model results to native builds.
+AGP source and its ignored build cache moved to `zyntax-agp` on 2026-09-19,
+preserving AGP-only Git history and existing output bytes. They are no longer
+built in this repository. The existing [verification record](docs/verification.md)
+retains historical integration evidence, including native APK/AAB self-builds;
+moving repositories does not qualify new artifacts or require rebuilding old ones.
 
 ## Roadmap
-
-AGP `-zyntax.4` corrects native metadata invalidation when the selected NDK
-location changes without changing its revision. All three source builds and the
-focused host cache-invalidation regression passed. APT package `1.0.0-4` is
-published; signed live indexes and the downloaded package bytes verified.
-App and SDK code are unchanged. See the [verification record](docs/verification.md#native-command-cache-invalidation).
 
 - [x] Inspect the r29 candidate and reject static tools and fallback wrappers.
 - [x] Verify publishing authentication and the connected USB device.
@@ -110,8 +93,7 @@ App and SDK code are unchanged. See the [verification record](docs/verification.
       install or publish the generated APK.
 - [x] Publish the verified packages and check signed repository installation.
 - [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
-- [x] Expose and verify typed missing-NDK sync diagnostics without weakening build errors.
-- [x] Expose and verify finalized CMake settings through the existing AGP public model.
+- [x] Separate AGP source/history/cache into its own repository; keep NDK ownership here.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
