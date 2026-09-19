@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
-project(ndk_host_probe LANGUAGES CXX)
+project(ndk_host_probe LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
-add_library(ndkprobe SHARED probe.cpp)
+add_library(ndkprobe SHARED probe.c probe.cpp)
 add_executable(ndkprobe-main main.cpp)
 target_link_libraries(ndkprobe-main PRIVATE ndkprobe)

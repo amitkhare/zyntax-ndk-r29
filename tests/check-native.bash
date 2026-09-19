@@ -2,7 +2,7 @@
 set -euo pipefail
 
 fixture="$(cd "$(dirname "${BASH_SOURCE[0]}")/native" && pwd)"
-: "${NDK_ROOT:?Select the installed NDK r29}"
+: "${NDK_ROOT:?Select the exact installed Android-host NDK}"
 : "${CMAKE:?Select the native CMake package executable}"
 : "${NINJA:?Select the native Ninja package executable}"
 : "${GNUMAKE:?Select the GNU Make package executable}"
@@ -12,6 +12,9 @@ fixture="$(cd "$(dirname "${BASH_SOURCE[0]}")/native" && pwd)"
 for tool in "$CMAKE" "$NINJA" "$GNUMAKE" "$NDK_HOST_PYTHON"; do
     [[ $tool == /* && -x $tool ]]
 done
+ndk_revision=$(sed -n 's/^Pkg.Revision = //p' "$NDK_ROOT/source.properties")
+[[ $ndk_revision =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+printf 'NDK %s native C/C++ build check\n' "$ndk_revision"
 test ! -e "$CHECK_DIR"
 mkdir -p "$CHECK_DIR"
 export GNUMAKE NDK_HOST_PYTHON
@@ -32,4 +35,4 @@ bash "$NDK_ROOT/ndk-build" -j2 NDK_PROJECT_PATH=null \
     "NDK_OUT=$CHECK_DIR/ndk/obj" "NDK_LIBS_OUT=$CHECK_DIR/ndk/lib"
 LD_LIBRARY_PATH="$CHECK_DIR/ndk/lib/arm64-v8a:$runtime${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" \
     "$CHECK_DIR/cmake/ndkprobe-main"
-printf 'CMake and ndk-build shared-library/C++ runtime checks passed.\n'
+printf 'NDK %s: CMake and ndk-build C/C++ shared-library/runtime checks passed.\n' "$ndk_revision"

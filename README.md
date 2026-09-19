@@ -99,6 +99,11 @@ Additional r27b, r28c and r30 source recipes and verified input caches are ready
 qualified or published** until the exact compiler, host source patch, assembly
 and focused Android native-build checks pass. The existing verified r29 package
 remains valid and is not rebuilt or changed merely by adding source recipes.
+Complete r27b, r28c and r30 LLVM trees are prepared with their exact 71, 51 and
+59 ordered Android patches. Source replay audits verify the resulting files;
+the four fuzzy hunks in each of r27b/r28c retain their intended changes, and r30
+applies without fuzz. This is source-only evidence, not compiler or device
+qualification. See the [source checkpoints](docs/source-preparation.md).
 
 - [x] Inspect the r29 candidate and reject static tools and fallback wrappers.
 - [x] Verify publishing authentication and the connected USB device.
@@ -120,7 +125,8 @@ remains valid and is not rebuilt or changed merely by adding source recipes.
 - [x] Verify R8-enabled DevRelease APK/AAB artifacts with test-only signing.
 - [x] Separate AGP source/history/cache into its own repository; keep NDK ownership here.
 - [x] Pin exact r27b, r28c and r30 inputs; validate provenance and the shared host patch.
-- [ ] Reconstruct each complete LLVM tree with its exact ordered Android patches.
+- [x] Reconstruct and audit the r28c LLVM tree with all exact ordered Android patches.
+- [ ] Reconstruct the r27b and r30 LLVM trees with their exact ordered Android patches.
 - [ ] Build and qualify those exact additional Android-host NDK distributions.
 - [ ] Publish verified additional revisions as coinstallable packages.
 
@@ -129,9 +135,11 @@ release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
 required by their declared AndroidX dependencies, plus the requested native
 test module. This is not a claim that the original projects were unchanged.
 
-`tests/check-native.bash` is the focused device check: it builds one small C++
-shared library with CMake and `ndk-build`, then checks linking, loading and C++
-exceptions. It requires explicit tool paths and a new private output directory;
+`tests/check-native.bash` is the focused device check: it builds one small C/C++
+shared library with CMake and `ndk-build`, then checks cross-language linking,
+loading and C++ exceptions. It reports the exact selected NDK revision from
+`source.properties`; the same fixture can qualify each additional release.
+It requires explicit tool paths and a new private output directory;
 it does not install packages, navigate the UI or touch signing keys.
 
 ## License
