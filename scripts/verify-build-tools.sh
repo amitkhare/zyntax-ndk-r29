@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$(dirname "${BASH_SOURCE[0]}")/release-common.bash"
 ndk="$(cd "${1:?Pass the assembled NDK directory}" && pwd -P)"
 host="$ndk/toolchains/llvm/prebuilt/linux-arm64"
-readelf=${READELF:-/work/ndk/android-ndk-r29/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf}
+readelf=${READELF:-$NDK_DIR/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf}
 
-grep -qx 'Pkg.Revision = 29.0.14206865' "$ndk/source.properties"
+grep -qx "Pkg.Revision = $NDK_REVISION" "$ndk/source.properties"
+cmp <(release_config tools) "$ndk/build-tools.txt"
+cmp <(release_config json) "$ndk/release.json"
 test -d "$host/sysroot/usr/include"
-test -d "$host/lib/clang/21/lib/linux"
+test -d "$host/lib/clang/$CLANG_MAJOR/lib/linux"
 test ! -e "$ndk/toolchains/llvm/prebuilt/linux-x86_64"
 test -z "$(find "$host" -name lldb-server -print -quit)"
 while IFS= read -r tool; do
@@ -32,7 +34,7 @@ while IFS= read -r tool; do
             *) echo "Undeclared host library required by $tool: $library" >&2; exit 1;;
         esac
     done < <(sed -n 's/.*(NEEDED).*\[\(.*\)\].*/\1/p' <<< "$dynamic")
-done < "$repo_dir/build-tools.txt"
+done < <(release_config tools)
 
 # Host executable dependencies must be Android platform libraries. Shared Python
 # and Make are used explicitly by scripts; no bundled desktop executable exists.

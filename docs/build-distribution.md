@@ -1,6 +1,8 @@
-# Android-host NDK r29 build tools
+# Android-host NDK build tools
 
-Revision **29.0.14206865**, for Android ARM64 hosts (API 24 or newer).
+For Android ARM64 hosts (API 24 or newer). The exact NDK revision is recorded
+in `source.properties` and `release.json`; install different revisions side by
+side instead of changing an existing project's declared version.
 
 This distribution contains Clang, LLD, the LLVM build utilities listed in
 `build-tools.txt`, the official Android target headers/libraries, and the NDK's
@@ -33,8 +35,9 @@ relicense the included components. LLVM uses Apache-2.0 with LLVM exceptions;
 the linked compression libraries retain their zlib/BSD licensing terms.
 
 `sources.tsv` records exact input URLs and SHA-256 checksums. The toolchain's
-`clang_source_info.md` and `manifest_13989888.xml` identify the original r29
-sources. Build instructions and source changes are maintained publicly at
+`clang_source_info.md` and the original XML manifests listed in `release.json`
+identify that exact compiler's sources. Build instructions and source changes
+are maintained publicly at
 <https://github.com/amitkhare/zyntax-ndk-r29>.
 
 Packaging checks are not evidence of successful compilation on a device.

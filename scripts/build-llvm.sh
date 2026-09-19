@@ -1,18 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SOURCE_DIR=${SOURCE_DIR:-/work/src/llvm-project}
-NDK_DIR=${NDK_DIR:-/work/ndk/android-ndk-r29}
-BUILD_DIR=${BUILD_DIR:-/work/build}
-INSTALL_DIR=${INSTALL_DIR:-/work/install/linux-aarch64}
+source "$(dirname "${BASH_SOURCE[0]}")/release-common.bash"
 BUILD_JOBS=${BUILD_JOBS:-2}
 ANDROID_API=24
 
 [[ $BUILD_JOBS =~ ^[1-9][0-9]*$ ]] || { echo 'BUILD_JOBS must be positive.' >&2; exit 1; }
-grep -qx 'Pkg.Revision = 29.0.14206865' "$NDK_DIR/source.properties"
+verify_ndk_revision
 test -f "$SOURCE_DIR/llvm/CMakeLists.txt"
-test -f /work/src/zlib/CMakeLists.txt
-test -f /work/src/zstd/build/cmake/CMakeLists.txt
+test -f "$zlib_source/CMakeLists.txt"
+test -f "$zstd_source/build/cmake/CMakeLists.txt"
 
 host_build="$BUILD_DIR/llvm-host"
 android_build="$BUILD_DIR/llvm-android"
@@ -50,10 +47,10 @@ android=(
 )
 
 # Compression libraries are target libraries, not libraries from the build host.
-cmake -S /work/src/zlib -B "$deps_build/zlib" "${android[@]}" \
+cmake -S "$zlib_source" -B "$deps_build/zlib" "${android[@]}" \
   -DCMAKE_INSTALL_PREFIX="$deps_install" -DZLIB_BUILD_EXAMPLES=OFF
 cmake --build "$deps_build/zlib" --parallel "$BUILD_JOBS" --target install
-cmake -S /work/src/zstd/build/cmake -B "$deps_build/zstd" "${android[@]}" \
+cmake -S "$zstd_source/build/cmake" -B "$deps_build/zstd" "${android[@]}" \
   -DCMAKE_INSTALL_PREFIX="$deps_install" \
   -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_STATIC=ON \
   -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_TESTS=OFF
@@ -82,12 +79,12 @@ cmake -S "$SOURCE_DIR/llvm" -B "$android_build" "${common[@]}" "${android[@]}" \
   -DLLVM_ENABLE_TERMINFO=OFF -DLLVM_ENABLE_LIBEDIT=OFF \
   -DLLVM_ENABLE_LIBXML2=OFF -DLLVM_ENABLE_CURL=OFF \
   -DLLVM_VERSION_SUFFIX= \
-  '-DCLANG_VENDOR=Android (r563880c, Android AArch64 host)' \
+  "-DCLANG_VENDOR=Android ($CLANG_REVISION, Android AArch64 host)" \
   -DCLANG_REPOSITORY_STRING=https://android.googlesource.com/toolchain/llvm-project
 install_targets=(install-clang-resource-headers-stripped)
 while IFS= read -r tool; do
   # These driver aliases are installed by the clang and lld components.
-  case "$tool" in clang++|clang-21|ld.lld) continue ;; esac
+  case "$tool" in clang++|"clang-$CLANG_MAJOR"|ld.lld) continue ;; esac
   install_targets+=("install-$tool-stripped")
-done < "$(dirname "${BASH_SOURCE[0]}")/../build-tools.txt"
+done < <(release_config tools)
 cmake --build "$android_build" --parallel "$BUILD_JOBS" --target "${install_targets[@]}"

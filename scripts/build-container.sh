@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-mkdir -p /work/logs
-exec > >(tee -a /work/logs/compiler-build.log) 2>&1
-bash /port/scripts/prepare-sources.sh
-bash /port/scripts/build-llvm.sh
+source "$(dirname "${BASH_SOURCE[0]}")/release-common.bash"
+mkdir -p "$release_work_dir/logs"
+exec > >(tee -a "$release_work_dir/logs/compiler-build.log") 2>&1
+bash "$repo_dir/scripts/prepare-sources.sh"
+bash "$repo_dir/scripts/build-llvm.sh"
 printf 'Compiler build completed. Distribution assembly and device verification remain.\n'

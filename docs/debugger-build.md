@@ -1,6 +1,6 @@
 # Optional Android-host debugger build
 
-**Prepared, not compiled or device-verified.** This stage is independent of the
+**Prepared for r29 only, not compiled or device-verified.** This stage is independent of the
 first native-build distribution. It builds genuine LLDB, LLDB Server, LLDB DAP
 and the Python API; no placeholder or external-debugger launcher is shipped.
 
@@ -36,10 +36,11 @@ It allows LLDB to include the selected Android libedit headers; it does not
 modify the NDK's target sysroot or the compiler driver.
 
 ```bash
-patch --batch --fuzz=0 -p1 -d /work/src/llvm-project \
+patch --batch --fuzz=0 -p1 -d /work/releases/29.0.14206865/src/llvm-project \
   < /port/patches/lldb-android-libedit.patch
 export TARGET_PREFIX="$(< /work/debugger-target/prefix.txt)"
 export HOST_PYTHON=/usr/bin/python3
+export NDK_RELEASE=r29
 bash /port/scripts/build-debugger.sh
 ```
 

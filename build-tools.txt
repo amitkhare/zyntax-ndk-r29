@@ -1,6 +1,5 @@
 clang
 clang++
-clang-21
 clang-format
 clang-scan-deps
 clang-tidy

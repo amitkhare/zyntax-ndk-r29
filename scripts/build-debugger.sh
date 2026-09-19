@@ -6,9 +6,9 @@ set -euo pipefail
 # sources-debugger.tsv; none of those packages are copied into the NDK.
 : "${TARGET_PREFIX:?Set TARGET_PREFIX to the extracted Android package prefix.}"
 : "${HOST_PYTHON:?Set HOST_PYTHON to an absolute Linux build-host Python executable.}"
-SOURCE_DIR=${SOURCE_DIR:-/work/src/llvm-project}
+source "$(dirname "${BASH_SOURCE[0]}")/release-common.bash"
+[[ $NDK_RELEASE == r29 ]] || { echo 'The optional debugger recipe is prepared for r29 only.' >&2; exit 1; }
 SWIG_SOURCE_DIR=${SWIG_SOURCE_DIR:-/work/src/swig}
-BUILD_DIR=${BUILD_DIR:-/work/build}
 BUILD_JOBS=${BUILD_JOBS:-2}
 
 [[ $BUILD_JOBS =~ ^[1-9][0-9]*$ ]]

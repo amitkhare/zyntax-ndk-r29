@@ -17,14 +17,15 @@ source and build instructions when distributed, according to their licenses.
 
 | Component | License material carried with the distribution |
 | --- | --- |
-| Official r29 build files, target headers and libraries | Original `NOTICE`, `NOTICE.toolchain`, toolchain notice and source-tree notices |
+| Selected official NDK release's build files, target headers and libraries | Original `NOTICE`, `NOTICE.toolchain`, toolchain notice and source-tree notices |
 | Source-built LLVM/Clang/LLD and LLVM utilities | `LLVM-LICENSE.TXT`, including LLVM exceptions and its component notices |
 | Statically linked zlib 1.3.1 | `zlib-LICENSE` |
 | Statically linked Zstandard 1.5.6 | `zstd-LICENSE`; the BSD license option is selected |
 | Original port infrastructure | `port-LICENSE` and this notice |
 
-The exact archives are recorded in `sources.tsv`; the original toolchain source
-manifest is preserved. Modified NDK source files are identified by the included
+The exact archives are pinned in `releases.json`; each generated distribution
+carries its selected `release.json` and `sources.tsv`. Original toolchain source
+manifests are preserved. Modified NDK source files are identified by the included
 source patch. The build-only distribution does not include GNU Make, Python,
 SWIG, LLDB, profiling or shader tools. Shared package dependencies retain their
 own licenses and are not relicensed or duplicated by this package.
