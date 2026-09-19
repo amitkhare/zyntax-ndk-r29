@@ -212,6 +212,27 @@ verified. The downloaded archive matched that hash. All six previous package
 records retained their filenames, sizes and hashes; only the new AGP revision
 was added. No NDK/compiler package or app/SDK source changed.
 
+## r28c build checkpoint
+
+On 20 September 2026, the exact r28c compiler completed its 292 host-generator
+and 3,859 Android compiler build tasks using the prepared, audited source tree.
+The build ran without network access and reused the existing source archives and
+cross compiler. Normal distribution assembly passed Android ARM64 ELF,
+interpreter/dependency and private-entrypoint checks. These host checks do not
+establish that the new compiler runs correctly on Android.
+
+| Local artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `android-ndk-r28c.tar` | 1067632640 | `fbc6f50384522b007880f459d2fc6ba6cffebadd90902cc39d6bc3e36fc184b7` |
+| `zyntax-ndk-28.2.13676358_28.2.13676358-1_aarch64.deb` | 145496696 | `d051c416ab45c3ee8a74d53bd11101080e31a921c28461aa8e9af3e3b60f5d76` |
+
+The package records source commit
+`70f51506b9fc9ae197f4e36da7a7ac8d8117fefc` and the original tar hash. The shared
+recipe in `zyntax-packages` commit `e31fe1d` validated release/source provenance,
+archive layout, modes and links before constructing the versioned package.
+No existing package was overwritten. Android CMake/ndk-build qualification and
+publication remain pending; this is not an available or supported release yet.
+
 ## Distribution audit
 
 The native-build distribution preserves Google's original notices and target

@@ -99,6 +99,9 @@ Additional r27b, r28c and r30 source recipes and verified input caches are ready
 qualified or published** until the exact compiler, host source patch, assembly
 and focused Android native-build checks pass. The existing verified r29 package
 remains valid and is not rebuilt or changed merely by adding source recipes.
+The r28c compiler and native distribution now build successfully; its local
+package is prepared, but the Android C/C++ check and publication remain pending.
+See the [r28c build checkpoint](docs/verification.md#r28c-build-checkpoint).
 Complete r27b, r28c and r30 LLVM trees are prepared with their exact 71, 51 and
 59 ordered Android patches. Source replay audits verify the resulting files;
 the four fuzzy hunks in each of r27b/r28c retain their intended changes, and r30
@@ -126,7 +129,7 @@ qualification. See the [source checkpoints](docs/source-preparation.md).
 - [x] Separate AGP source/history/cache into its own repository; keep NDK ownership here.
 - [x] Pin exact r27b, r28c and r30 inputs; validate provenance and the shared host patch.
 - [x] Reconstruct and audit the r28c LLVM tree with all exact ordered Android patches.
-- [ ] Reconstruct the r27b and r30 LLVM trees with their exact ordered Android patches.
+- [x] Reconstruct the r27b and r30 LLVM trees with their exact ordered Android patches.
 - [ ] Build and qualify those exact additional Android-host NDK distributions.
 - [ ] Publish verified additional revisions as coinstallable packages.
 
