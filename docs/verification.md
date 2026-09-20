@@ -230,8 +230,21 @@ The package records source commit
 `70f51506b9fc9ae197f4e36da7a7ac8d8117fefc` and the original tar hash. The shared
 recipe in `zyntax-packages` commit `e31fe1d` validated release/source provenance,
 archive layout, modes and links before constructing the versioned package.
-No existing package was overwritten. Android CMake/ndk-build qualification and
-publication remain pending; this is not an available or supported release yet.
+No existing package was overwritten.
+
+The unchanged archive subsequently passed both Android CMake and `ndk-build`
+C/C++ shared-library/runtime checks on the connected Dev app. Each execution
+returned `NDK native result: 42`, including STL exceptions and cross-language
+linking. Evidence: qualification stage `02-agp-8.12.3.i1YJdm`, structured native
+receipt identity `43e88443bdc0e989a1b2b307c209b8f5ef1acfaea8f49441b41bab7e3ddf3e07`,
+archive hash as recorded above. The separate APK qualification is still pending.
+
+Preparation corrected the test-owned executable location to the inherited
+app-private files boundary, installed the normal signed CMake host headers,
+and renamed the C fixture to `probe_c.c` so ndk-build does not collide with
+`probe.cpp`'s object basename. No compiler binary, host routing, app, SDK or
+bootstrap was changed. Previous failed stages are retained and are not pass
+evidence. Publication remains pending; this is not a live release yet.
 
 ## Distribution audit
 

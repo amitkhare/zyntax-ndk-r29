@@ -100,7 +100,8 @@ qualified or published** until the exact compiler, host source patch, assembly
 and focused Android native-build checks pass. The existing verified r29 package
 remains valid and is not rebuilt or changed merely by adding source recipes.
 The r28c compiler and native distribution now build successfully; its local
-package is prepared, but the Android C/C++ check and publication remain pending.
+package is prepared and the Android CMake/ndk-build C/C++ checks passed.
+APK integration and publication remain pending.
 See the [r28c build checkpoint](docs/verification.md#r28c-build-checkpoint).
 Complete r27b, r28c and r30 LLVM trees are prepared with their exact 71, 51 and
 59 ordered Android patches. Source replay audits verify the resulting files;
@@ -142,8 +143,10 @@ test module. This is not a claim that the original projects were unchanged.
 shared library with CMake and `ndk-build`, then checks cross-language linking,
 loading and C++ exceptions. It reports the exact selected NDK revision from
 `source.properties`; the same fixture can qualify each additional release.
-It requires explicit tool paths and a new private output directory;
-it does not install packages, navigate the UI or touch signing keys.
+It requires explicit tool paths and a new private output directory inside the
+host's executable storage. Termux CMake also needs its normal `ndk-sysroot`
+host-header package; see [dependencies](docs/build-distribution.md#dependencies).
+The check does not install packages, navigate the UI or touch signing keys.
 
 ## License
 

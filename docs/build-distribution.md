@@ -20,7 +20,18 @@ Install Bash, GNU Make and Python in the Android userspace. Select the package
 executables explicitly with `GNUMAKE` and `NDK_HOST_PYTHON` before `ndk-build`.
 Projects using x86 `.asm` sources also select the Yasm package executable through
 `NDK_HOST_YASM`; ordinary C/C++ builds do not need it.
-Use a native Android CMake and Ninja for CMake projects. SDK/Gradle/JDK selection
+Use a native Android CMake and Ninja for CMake projects. Termux CMake also reads
+the host's `$PREFIX/include/android/api-level.h` during system detection, before
+loading the selected NDK toolchain. Install its normal `ndk-sysroot` header
+package when using this NDK compiler without Termux Clang; the NDK's target
+sysroot does not replace that host prerequisite.
+
+Keep the NDK and executable build outputs inside the host application's allowed
+executable storage (Zyntax's app-private `files` tree, including its home and
+projects directories). An application cache directory may store downloaded
+archives, but it is not an executable installation location.
+
+SDK/Gradle/JDK selection
 is outside this toolchain; existing projects must select an Android-host-capable
 Android Gradle Plugin to use this NDK's actual host directory.
 
