@@ -237,14 +237,29 @@ C/C++ shared-library/runtime checks on the connected Dev app. Each execution
 returned `NDK native result: 42`, including STL exceptions and cross-language
 linking. Evidence: qualification stage `02-agp-8.12.3.i1YJdm`, structured native
 receipt identity `43e88443bdc0e989a1b2b307c209b8f5ef1acfaea8f49441b41bab7e3ddf3e07`,
-archive hash as recorded above. The separate APK qualification is still pending.
+archive hash as recorded above. The same batch also built the isolated unsigned
+Java/resource/native APK with AGP `8.12.3-zyntax.4`, the original Android-host
+Gradle 8.14.3 distribution, Java 21.0.12, SDK 36 and build-tools 37.0.0. APK:
+3,756 bytes, SHA-256
+`d5bc83f290f9917c1ffd4b2cd31a1f216019713c87bd617fb2accc42160e59e0`.
+The combined native/APK row passed in 222.301 seconds; harness evidence
+`run-6771265207245062683/output.log`. The APK was not installed or launched.
 
 Preparation corrected the test-owned executable location to the inherited
 app-private files boundary, installed the normal signed CMake host headers,
 and renamed the C fixture to `probe_c.c` so ndk-build does not collide with
 `probe.cpp`'s object basename. No compiler binary, host routing, app, SDK or
 bootstrap was changed. Previous failed stages are retained and are not pass
-evidence. Publication remains pending; this is not a live release yet.
+evidence.
+
+Package `zyntax-ndk-28.2.13676358=28.2.13676358-1` is now published at
+`pkg.zyntax.app`. Live verification passed both signatures, all three index
+hashes and all eight indexed package-object sizes. The seven previous package
+records retain their exact filenames, bytes and hashes; only r28c was added.
+The unqualified AGP `1.0.0-5` candidate was explicitly excluded. Verification
+used package HEAD requests, not repeat downloads. With user approval, only
+the completed r28c compiler intermediates were removed (18.316 GiB); sources,
+downloads, installed compiler, distribution, package and logs remain intact.
 
 ## Distribution audit
 
