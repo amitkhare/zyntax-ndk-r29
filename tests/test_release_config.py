@@ -37,6 +37,17 @@ class ReleaseConfigTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "No exact source recipe"):
             CONFIG.load_release("r999", self.manifest)
 
+    def test_r27_keeps_its_original_identity_not_r27b(self):
+        _, baseline, sources = CONFIG.load_release("r27", self.manifest)
+        _, update, update_sources = CONFIG.load_release("r27b", self.manifest)
+        self.assertEqual("27.0.12077973", baseline["revision"])
+        self.assertEqual("r522817", baseline["clangRevision"])
+        self.assertEqual("5ab132bd1afa945695853fa093dfcc839e45f97c", baseline["androidChanges"])
+        self.assertEqual(sources["llvm"], update_sources["llvm"])
+        self.assertNotEqual(baseline["androidChanges"], update["androidChanges"])
+        self.assertNotEqual(baseline["patchManifestSha256"], update["patchManifestSha256"])
+        self.assertNotEqual(sources["ndk"]["sha256"], update_sources["ndk"]["sha256"])
+
     def test_unsafe_or_unpinned_inputs_are_rejected(self):
         for field, value in (("name", "../source.tar.gz"), ("sha256", "unverified"), ("url", "http://example.com/source")):
             with self.subTest(field=field):

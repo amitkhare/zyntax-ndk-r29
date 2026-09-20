@@ -14,6 +14,39 @@
     }
   },
   "releases": {
+    "r27": {
+      "revision": "27.0.12077973",
+      "clangRevision": "r522817",
+      "clangMajor": 18,
+      "llvmSvnRevision": 522817,
+      "llvmBase": "3c92011b600bdf70424e2547594dd461fe411a41",
+      "androidChanges": "5ab132bd1afa945695853fa093dfcc839e45f97c",
+      "sourceInfoSha256": "a0a8579710627e72a55861ab50e106903ff4bfc40b96f1f038ae871a2c8f3f6f",
+      "patchManifestSha256": "90951a0068266c281186aeba39acc160aed6726421a1cd1d4309a0508e2f8a26",
+      "provenanceFiles": [
+        "manifest_12027248.xml"
+      ],
+      "hostPatch": "patches/ndk-host-aarch64.patch",
+      "sources": {
+        "ndk": {
+          "name": "android-ndk-r27-linux.zip",
+          "sha256": "2f17eb8bcbfdc40201c0b36e9a70826fcd2524ab7a2a235e2c71186c302da1dc",
+          "url": "https://dl.google.com/android/repository/android-ndk-r27-linux.zip",
+          "size": 663957918,
+          "sha1": "5e5cd517bdb98d7e0faf2c494a3041291e71bdcc"
+        },
+        "llvm": {
+          "name": "llvm-project-3c92011b.tar.gz",
+          "sha256": "fa16f94ad54bca1297357cf120d71d721aaab192000108dc38cfdcaa5adec3f3",
+          "url": "https://github.com/llvm/llvm-project/archive/3c92011b600bdf70424e2547594dd461fe411a41.tar.gz"
+        },
+        "android": {
+          "name": "llvm-android-5ab132bd.tar.gz",
+          "sha256": "5565b850fae036935c37db2b671b758dac8f04541d37b63f731020530ea5e1cc",
+          "url": "https://android.googlesource.com/toolchain/llvm_android/+archive/5ab132bd1afa945695853fa093dfcc839e45f97c.tar.gz"
+        }
+      }
+    },
     "r27b": {
       "revision": "27.1.12297006",
       "clangRevision": "r522817b",

@@ -302,6 +302,35 @@ this publication adds r27b and the independently qualified AGP `1.0.0-5`.
 Local package hashes were verified before upload; live availability used HEAD
 requests without repeated archive downloads. r30 remains a separate pending gate.
 
+## r30 build checkpoint
+
+On 20 September 2026, the exact r30 (`30.0.16248370`) compiler and all selected
+install targets completed offline from source checkpoint
+`35947083d68b5630b3070ac53655c7809d282b87`. Two earlier attempts exhausted the
+6 GiB memory-only limit and retained their logs and cached build outputs.
+The successful cache-preserving resume used one worker, the same 6 GiB memory
+limit and at most 2 GiB of already-existing VM swap; it did not reconfigure the
+compiler, change source or flags, or download inputs again. The retained final
+container exited 0 with `OOMKilled=false`; its log is
+`logs/compiler-resume-1job-swap.log` in the exact-revision work directory.
+
+Normal assembly passed Android ARM64 host ELF, interpreter/dependency and
+Bash-entrypoint checks. The original target sysroot/runtimes and notices were
+preserved. The release-specific output was exported directly to the host's
+artifact drive; no extra archive copy was created on the Docker backing drive.
+
+| Local artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `android-ndk-r30.tar` | 1210746880 | `bd88fc621f43a6164956e6bd4548626b9323d4457ed8b632923752ee995e84e8` |
+| `zyntax-ndk-30.0.16248370_30.0.16248370-1_aarch64.deb` | 173032144 | `71c7ae1164a3d14160d159188aebfa865a2840e4d70a1263f6f3cb6c9ea74f67` |
+
+The existing offline package recipe validated archive identity and provenance
+against that compiler-start source commit before packaging. No existing output
+was overwritten. All 19,165,749,248 bytes of generated compiler intermediates,
+source/download caches, installed compiler, assembly and logs remain retained.
+Android native/APK qualification and publication are still pending; these
+host/package checks do not claim device compatibility.
+
 ## Distribution audit
 
 The native-build distribution preserves Google's original notices and target

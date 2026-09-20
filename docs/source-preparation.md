@@ -85,6 +85,31 @@ an unverified Windows bind-mounted build tree for Linux filesystem semantics.
 a supported Docker disk-location change can preserve the existing Linux volume
 and caches, but requires explicit user approval and stopped workloads.
 
+## r27 input checkpoint: 2026-09-20
+
+Exact r27 (`27.0.12077973`) is now pinned separately. Its original Linux archive
+passed Google's repository-index size (663,957,918 bytes) and SHA-1
+`5e5cd517bdb98d7e0faf2c494a3041291e71bdcc`. Its recorded SHA-256 is
+`2f17eb8bcbfdc40201c0b36e9a70826fcd2524ab7a2a235e2c71186c302da1dc`.
+An interrupted transfer retained its bytes; a single explicit range resume
+acquired only the missing remainder before those whole-file checks passed.
+
+The Linux archive identifies Clang `r522817`, LLVM base
+`3c92011b600bdf70424e2547594dd461fe411a41`, and Android changes
+`5ab132bd1afa945695853fa093dfcc839e45f97c` in `manifest_12027248.xml`.
+The source report and exact patch manifest reconcile to 68 ordered Android
+changes. Their SHA-256 pins are recorded in `releases.json`; the source report
+and XML manifest also match the original installed Windows r27 metadata.
+
+The existing original LLVM, zlib and Zstandard archives are reused. Only the
+missing original Linux NDK and 475,519-byte Android changes archive were
+acquired. Neither r27b's patched tree nor its compiler is substituted. The
+shared host patch passes `--dry-run --batch --fuzz=0` on r27's original Linux
+build scripts, with only the same nine-line legacy-CMake offset as r27b.
+
+This records input and source-contract checks only. Full LLVM preparation,
+compiler build, assembly and Android qualification remain separate gates.
+
 ## r28c source-only checkpoint: 2026-09-20
 
 NDK `28.2.13676358` now has its complete LLVM tree prepared at

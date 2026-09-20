@@ -58,6 +58,12 @@ SHA-256 values pin the acquired bytes; they are not claimed to be separately
 published Google checksums. Immutable LLVM and Android source commit URLs are
 pinned by SHA-256 after acquisition. The original source archives are retained.
 
+Exact r27 (`27.0.12077973`) also has a pinned source recipe for projects requiring
+that revision. It reuses the original LLVM base archive, not the patched r27b
+tree or compiler: its own `r522817` source report selects 68 Android patches.
+Inputs and host-patch compatibility are checked; its compiler and Android
+qualification are still pending. See the [r27 input checkpoint](docs/source-preparation.md#r27-input-checkpoint-2026-09-20).
+
 Each release uses its own exact official Linux NDK as the **build-host** cross
 compiler, not an Android runtime substitute. Host CMake, Ninja and the native
 source-generator compiler are shared. Sources, CMake caches, installed compiler
@@ -100,8 +106,9 @@ The r27b compiler, distribution and package passed their source/host checks and
 Android CMake/ndk-build C/C++ runtime and APK qualification. Its versioned
 package is published and live-verified; see the
 [r27b checkpoint](docs/verification.md#r27b-build-checkpoint).
-r30 is compiling offline from its exact prepared sources; its compiler,
-assembly, device and publication gates remain pending. The existing verified
+r30's offline compiler, assembly and package checks passed; Android native/APK
+qualification and publication remain pending. See the
+[r30 checkpoint](docs/verification.md#r30-build-checkpoint). The existing verified
 r29 package remains valid and is not rebuilt merely by adding source recipes.
 The r28c compiler and native distribution now build successfully; its Android
 CMake/ndk-build C/C++ checks and isolated APK integration passed. Its exact
