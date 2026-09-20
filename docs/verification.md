@@ -261,6 +261,35 @@ used package HEAD requests, not repeat downloads. With user approval, only
 the completed r28c compiler intermediates were removed (18.316 GiB); sources,
 downloads, installed compiler, distribution, package and logs remain intact.
 
+## r27 build checkpoint
+
+Exact r27 (`27.0.12077973`, not r27b) completed its source compiler, normal
+assembly and packaging from source checkpoint
+`df180ff3cef00409b88993d424a1e384b7d593c6`.
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `android-ndk-r27.tar` | 1175306240 | `fe7428786de14d82e1696bed30b23626248db39ee335d96bf10003c700670715` |
+| `zyntax-ndk-27.0.12077973_27.0.12077973-1_aarch64.deb` | 149305340 | `65d693e20bf3adfaecbf6c74788b27424eb6ad5036b20c2734c4f3735f8ed717` |
+
+On 2026-09-20, row 08 passed CMake 3.22.1 and ndk-build C/C++ shared-library,
+linking and exception/runtime checks, followed by the Java/resource/native APK.
+AGP `8.7.2-zyntax.1` resolved its unchanged default `27.0.12077973` with no
+authored `ndkVersion`; Gradle `8.11.1.1`, Java 17.0.20, SDK 35 and build-tools
+37.0.0 were observed. APK: 3,740 bytes, SHA-256
+`6d50ec0f9635fe07feae9e494b60732bfee8d970a638b5db9d8aa16ca64d80be`.
+
+The combined native/APK/Builder integration run passed in 491.024 seconds.
+Structured identity: `c77f317bed8c55c9d24f6c5c9d05334338a5b95151112448ed400506fba00ef5`;
+retained host log SHA-256:
+`cc546965fb098c45cd72c70c3080e3b58b4fc6108984ffbc6a3ea2860e1a90ca`.
+The APK was neither installed nor launched. No user project, app/core,
+extension SDK or bootstrap changed. Package
+`zyntax-ndk-27.0.12077973=27.0.12077973-1` is now published at `pkg.zyntax.app`.
+Both live signatures, all three package-index hashes and all 13 package-object
+sizes verified. Existing package records remained unchanged; availability used
+HEAD checks without downloading the same archives again.
+
 ## r27b build checkpoint
 
 The exact r27b (`27.1.12297006`) compiler completed all 3,827 target steps from

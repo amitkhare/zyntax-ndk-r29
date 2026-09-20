@@ -3,9 +3,9 @@
 Source-built Android-ARM64 host ports of exact Android NDK releases. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: r27b, r28c, r29 and r30 native-build packages are published at `pkg.zyntax.app`.
+**Status: exact r27, r27b, r28c, r29 and r30 native-build packages are published at `pkg.zyntax.app`.
 All passed Android CMake/ndk-build and APK checks; r29 also passed APK/AAB signing
-and full-project builds. Exact r27 compilation is in progress.** See
+and full-project builds. Exact r27 additionally passed AGP's default-NDK selection.** See
 [verification](docs/verification.md). AGP is a different tool and is maintained
 in the separate [zyntax-agp repository](https://github.com/amitkhare/zyntax-agp).
 
@@ -61,8 +61,10 @@ pinned by SHA-256 after acquisition. The original source archives are retained.
 Exact r27 (`27.0.12077973`) also has a pinned source recipe for projects requiring
 that revision. It reuses the original LLVM base archive, not the patched r27b
 tree or compiler: its own `r522817` source report selects 68 Android patches.
-Inputs and host-patch compatibility are checked; its compiler and Android
-qualification are still pending. See the [r27 input checkpoint](docs/source-preparation.md#r27-input-checkpoint-2026-09-20).
+Its compiler, assembly and Android CMake/ndk-build/APK qualification passed,
+including AGP 8.7.2's unauthored default NDK selection. See the
+[r27 build checkpoint](docs/verification.md#r27-build-checkpoint) and
+[source provenance](docs/source-preparation.md#r27-input-checkpoint-2026-09-20).
 
 Each release uses its own exact official Linux NDK as the **build-host** cross
 compiler, not an Android runtime substitute. Host CMake, Ninja and the native
@@ -102,6 +104,8 @@ moving repositories does not qualify new artifacts or require rebuilding old one
 
 ## Roadmap
 
+Exact r27 now passes the same native checks and an AGP-default APK build;
+it is published separately from r27b, with signed repository verification.
 The r27b compiler, distribution and package passed their source/host checks and
 Android CMake/ndk-build C/C++ runtime and APK qualification. Its versioned
 package is published and live-verified; see the
@@ -142,8 +146,8 @@ qualification. See the [source checkpoints](docs/source-preparation.md).
 - [x] Pin exact r27b, r28c and r30 inputs; validate provenance and the shared host patch.
 - [x] Reconstruct and audit the r28c LLVM tree with all exact ordered Android patches.
 - [x] Reconstruct the r27b and r30 LLVM trees with their exact ordered Android patches.
-- [ ] Build and qualify those exact additional Android-host NDK distributions.
-- [ ] Publish verified additional revisions as coinstallable packages.
+- [x] Build and qualify exact r27, r27b, r28c and r30 Android-host distributions.
+- [x] Publish qualified r27 alongside the other coinstallable revisions.
 
 Both sample projects now compile native libraries and produce verified signed
 release APKs/AABs. Their device copies retain the earlier compile SDK 37 change
