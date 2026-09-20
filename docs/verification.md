@@ -261,6 +261,47 @@ used package HEAD requests, not repeat downloads. With user approval, only
 the completed r28c compiler intermediates were removed (18.316 GiB); sources,
 downloads, installed compiler, distribution, package and logs remain intact.
 
+## r27b build checkpoint
+
+The exact r27b (`27.1.12297006`) compiler completed all 3,827 target steps from
+the retained checksum-pinned inputs without network access. Normal assembly
+passed Android ARM64 host ELF and entrypoint checks; target sysroot/runtime
+files and upstream notices remain authentic. Package provenance records source
+checkpoint `f24f1b19bbbbd5d7859f56d55f80d2cd4c0ca435`.
+
+| Artifact | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `android-ndk-r27b.tar` | 1175541760 | `1d84c5a3a2b7ff26421b934651e8caa886bcd9a99987bc66e3ef7b17b3ca23fb` |
+| `zyntax-ndk-27.1.12297006_27.1.12297006-1_aarch64.deb` | 149302692 | `2d21448fd73e6d9820013cc5fdcd33bbf3fbb272c4ec71f2cda4492c2c9a0879` |
+
+On 2026-09-20 the unchanged distribution passed CMake and ndk-build C/C++
+shared-library/runtime checks; both returned `NDK native result: 42` with STL
+exceptions and cross-language linking. The same headless Dev invocation then
+built the unsigned Java/resource/native APK using AGP `8.7.2-zyntax.1`, Android
+Gradle `8.11.1.1`, Termux Java 17.0.20, SDK 35 and build-tools 37.0.0.
+The combined row passed in 378.206 seconds. APK: 3,740 bytes, SHA-256
+`73e286d98d98206fe7ee2a189f19217f8c631684e9d31db964eb2c3c6dbe2d35`.
+
+Evidence: stage `01-agp-8.7.2.vxWcuT`, harness
+`run-3303616815406291159/output.log`, structured input identity
+`50c66326f5b1ad86f0ae7db4a180bba7648724b07f3c1c69e5347109b56c5df0`.
+The preserved host log has SHA-256
+`6dd1662b701238c40dea5e54968f1bc1e286916a2253f80a495c65998a216d33`.
+The APK was not installed or launched; no UI navigation, user-project,
+app/core, extension-SDK or bootstrap changes were made.
+
+After the APK passed, the user's conditional approval allowed deletion of only
+`/work/releases/27.1.12297006/build` (17.96 GiB generated intermediates).
+Sources, downloads, installed compiler, distribution, package and logs remain.
+The intermediate files can be regenerated from those retained inputs.
+
+Package `zyntax-ndk-27.1.12297006=27.1.12297006-1` is now published at
+`pkg.zyntax.app`. Both live signatures, all index hashes and all ten indexed
+package sizes verified. All eight previous package records remain unchanged;
+this publication adds r27b and the independently qualified AGP `1.0.0-5`.
+Local package hashes were verified before upload; live availability used HEAD
+requests without repeated archive downloads. r30 remains a separate pending gate.
+
 ## Distribution audit
 
 The native-build distribution preserves Google's original notices and target
