@@ -328,8 +328,22 @@ The existing offline package recipe validated archive identity and provenance
 against that compiler-start source commit before packaging. No existing output
 was overwritten. All 19,165,749,248 bytes of generated compiler intermediates,
 source/download caches, installed compiler, assembly and logs remain retained.
-Android native/APK qualification and publication are still pending; these
-host/package checks do not claim device compatibility.
+The subsequent consolidated Android row 07 passed on 20 September 2026 in
+362.188 seconds with Gradle 9.7.1.1, AGP 9.4.0-zyntax.1, Java 21.0.12,
+NDK 30.0.16248370, genuine CMake 3.22.1, SDK 36 and build-tools 37.0.0.
+CMake and ndk-build C/C++ runtime results were both 42. The APK was 878,737 bytes,
+SHA-256 `1962f04e2ecda5b550a94fa7ed7bcae603b8deaca22fa0a1ac2470d7254a2c3d`;
+manifest, DEX and ARM64 native library were checked without installing the APK.
+Dev run: `run-8737853886882941298`. Retained host log SHA-256:
+`d119fc43a1a86ccbd55d018d18fe8aa0232e517bd544e1aeef9a55c567d03db9`.
+The check used original APT 2.8.1-2 and normal local-file installation, not an APT patch.
+
+The unchanged r30 package and CMake 3.22.1 package are now published at
+`pkg.zyntax.app`. Both signed metadata files, all three package-index hashes
+and all 12 indexed package-object sizes verified. Existing releases were retained.
+After qualification, the user's conditional cleanup approval was applied only to
+`/work/releases/30.0.16248370/build` (17.8 GiB of rebuildable compiler intermediates).
+Sources, download cache, installed compiler, distribution, packages and logs remain.
 
 ## Distribution audit
 

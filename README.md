@@ -3,9 +3,9 @@
 Source-built Android-ARM64 host ports of exact Android NDK releases. This is a public,
 standalone toolchain project; it does not contain or require Zyntax app source.
 
-**Status: r27b, r28c and r29 native-build packages are published at `pkg.zyntax.app`.
+**Status: r27b, r28c, r29 and r30 native-build packages are published at `pkg.zyntax.app`.
 All passed Android CMake/ndk-build and APK checks; r29 also passed APK/AAB signing
-and full-project builds. r30 qualification is in progress.** See
+and full-project builds. Exact r27 compilation is in progress.** See
 [verification](docs/verification.md). AGP is a different tool and is maintained
 in the separate [zyntax-agp repository](https://github.com/amitkhare/zyntax-agp).
 
@@ -106,8 +106,8 @@ The r27b compiler, distribution and package passed their source/host checks and
 Android CMake/ndk-build C/C++ runtime and APK qualification. Its versioned
 package is published and live-verified; see the
 [r27b checkpoint](docs/verification.md#r27b-build-checkpoint).
-r30's offline compiler, assembly and package checks passed; Android native/APK
-qualification and publication remain pending. See the
+r30's offline compiler, assembly, CMake/ndk-build native checks and APK
+qualification passed; its package is published and live-verified. See the
 [r30 checkpoint](docs/verification.md#r30-build-checkpoint). The existing verified
 r29 package remains valid and is not rebuilt merely by adding source recipes.
 The r28c compiler and native distribution now build successfully; its Android
